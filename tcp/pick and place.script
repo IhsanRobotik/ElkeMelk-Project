@@ -1,0 +1,28 @@
+textmsg(get_actual_tcp_pose())
+port = 5005
+ip = "192.168.0.123"
+socket_name = "fadil"
+
+socket = socket_open(ip, port, socket_name)
+
+while(True):
+receive = socket_read_ascii_float(2, socket_name)
+textmsg(receive)
+sleep(0.01)
+
+#socket_send_string(get_actual_tcp_pose(), socket_name)
+
+a=get_actual_tcp_pose()
+
+movel (p[-0.181968, -0.232335, 0.676012, -1.21788, -1.19408, 1.22472])
+
+x= receive[1] / 1000
+y= receive[2] / 1000
+z= 0.29
+
+movel (p[x, y, z, a[3], a[4], a[5]])
+
+movel (p[-0.181968, -0.232335, 0.676012, -1.21788, -1.19408, 1.22472])
+sleep(2)
+end
+

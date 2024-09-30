@@ -1,0 +1,14 @@
+port = 1244
+ip="192.168.78.1"
+socket_name = "Fadil"
+socket = socket_open(ip, port, socket_name)
+while (True);
+    receive = socket_read_ascii_float(3,socket_name)
+    textmsg(receive)
+    textmsg(receive [1])
+    textmsg(receive [2])
+    textmsg(receive [3])
+    sleep(1)
+    socket_send_string("kill me", socket_name) 
+end
+socket_close(socket_name)
