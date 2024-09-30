@@ -1,3 +1,5 @@
+# This was programmed for my MacBook, please change for Windows
+
 from ultralytics import YOLO
 import cv2
 import numpy as np
