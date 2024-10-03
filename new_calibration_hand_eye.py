@@ -8,7 +8,7 @@ import ast
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind de socket aan het adres en de poort
-s.bind(("192.168.0.42", 5005))
+s.bind(("192.168.0.45", 5005))
 
 # Luister naar binnenkomende verbindingen
 s.listen(5)
@@ -21,8 +21,27 @@ print(f"Connection from {address} has been established!")
 # Stel een timeout in voor het ontvangen van gegevens om te voorkomen dat het blokkeert
 clientsocket.settimeout(1.0)
 
+previouspositionX = -184.70
+previouspositionY = -637.60
+
 pickupX = 0
 pickupY = 0
+
+deltarobotpositionX = 0
+deltarobotpositionY = 0
+
+newRobotXRef = 0
+newRobotYRef = 0
+
+robotXRef = 26.02
+robotYRef = -550.07
+
+newRobotXRef = 0
+newRobotYRef = 0
+
+bottleXRef = 128.27
+bottleYRef = 69.51
+
 
 # Bekende referentiepositie van de gripper
 gripperXRef = 280.75  # De X-positie van de gripper op de grond
@@ -72,8 +91,8 @@ def main():
         # Detecteer cirkels (flessen)
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-                                   param1=18, param2=20,
-                                   minRadius=19, maxRadius=25)
+                                   param1=40, param2=25,
+                                   minRadius=25, maxRadius=33)
 
         if circles is not None:
             circles = np.uint16(np.around(circles))
@@ -88,8 +107,8 @@ def main():
                 center_mm = (center_pixels[0] * conversion_factor, center_pixels[1] * conversion_factor)
 
                 # Bereken de delta's tussen de fles en de gripperpositie
-                deltaX = gripperXRef - center_mm[0]
-                deltaY = gripperYRef - center_mm[1]
+                deltaX = center_mm[0] - bottleXRef
+                deltaY = center_mm[1] - bottleYRef
 
                 # Ontvang de huidige coördinaten van de robot van de client
                 try:
@@ -104,8 +123,14 @@ def main():
                         # array[1] is de huidige X-coördinaat van de robot
 
                         # Bereken de nieuwe robot pick-up coördinaten
-                        pickupX = (array[1] * 1000) + deltaX  # Huidige X-coördinaat + deltaX
-                        pickupY = (array[0] * 1000) + deltaY  # Huidige Y-coördinaat + deltaY
+                        deltarobotpositionX = (array[0] * 1000) - previouspositionX
+                        deltarobotpositionY = (array[1] * 1000) - previouspositionY                        
+                        
+                        newRobotXRef = deltarobotpositionX + robotXRef  # Huidige X-coördinaat + deltaX
+                        newRobotYRef = deltarobotpositionY + robotYRef  # Huidige Y-coördinaat + deltaY
+
+                        pickupX = newRobotXRef - deltaY
+                        pickupY = newRobotYRef - deltaX
 
                         # Druk de nieuwe pick-up coördinaten van de robot af
                         robotPickUpCoord = [pickupX, pickupY]

@@ -8,7 +8,7 @@ import time
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the address and port
-s.bind(("192.168.0.42", 5005))
+s.bind(("192.168.0.45", 5005))
 
 # Listen for incoming connections
 s.listen(5)
@@ -20,10 +20,11 @@ print(f"Connection from {address} has been established!")
 pickupX = 0
 pickupY = 0
 
-robotXRef = 124.5
-RobotYRef = 195
-cameraXRef = -223.5
-cameraYRef = -169.6
+robotXRef = 26.02
+robotYRef = -550.07
+#change the bottleXRef flip it
+bottleXRef = 128.27
+bottleYRef = 69.51
 
 def main():
     # Camera matrix and distortion coefficients
@@ -73,8 +74,8 @@ def main():
         # Detect circles
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-                                   param1=40, param2=30,
-                                   minRadius=30, maxRadius=35)
+                                   param1=40, param2=25,
+                                   minRadius=25, maxRadius=33)
 
         # Draw the circles on the undistorted frame and label them
         if circles is not None:
@@ -100,11 +101,11 @@ def main():
                 cv.putText(undistorted_frame, text, (center_pixels[0] - 30, center_pixels[1]), 
                            cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
                 
-                deltaX = cameraXRef - center_mm[0]
-                deltaY = cameraYRef - center_mm[1]
+                deltaX = bottleXRef - center_mm[0]
+                deltaY = bottleYRef - center_mm[1]
 
                 pickupX = robotXRef + deltaY
-                pickupY = RobotYRef + deltaX
+                pickupY = robotYRef + deltaX
 
                 # robotPickUpCoord = [pickupX, pickupY] 
                 # # Sending a message back to the client
@@ -123,7 +124,7 @@ def main():
             break
 
         elapsed_time = time.time() - start_time
-        #time.sleep(max(0, 0.2 - elapsed_time))
+        time.sleep(max(0, 0.2 - elapsed_time))
 
     cap.release()
     cv.destroyAllWindows()

@@ -5,7 +5,7 @@ import cv2
 from ultralytics import YOLO
 
 # Load your YOLO model
-model = YOLO('C:/Users/gabri/Desktop/runs/detect/train/weights/best.pt')  # Replace with the correct path to the model
+model = YOLO("C:/Users/basti/Documents/GitHub/ElkeMelk-Project/YOLOv8_Training_2/runs/detect/train/weights/best.pt")  # Replace with the correct path to the model
 
 # Change number inside () if you have more than 1 cameras, 0 is for default
 cap = cv2.VideoCapture(0)

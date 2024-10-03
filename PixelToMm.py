@@ -12,7 +12,7 @@ def main():
                      2.34191361e-03, 4.19774044e+00]) 
 
    
-    known_width_mm = 560  
+    known_width_mm = 389  
     known_pixel_width = 640 
 
     # Calculate conversion factor from pixels to mm
@@ -47,8 +47,8 @@ def main():
         # Detect circles
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-                                   param1=18, param2=20,
-                                   minRadius=19, maxRadius=25)
+                                   param1=40, param2=25,
+                                   minRadius=25, maxRadius=33)
 
         # Draw the circles on the undistorted frame and print centers in mm
         if circles is not None:

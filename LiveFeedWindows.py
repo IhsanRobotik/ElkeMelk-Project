@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 # Load your YOLOv8 model (Update the path to your model file as per Windows path format)
-model = YOLO(r'C:\Users\gabri\Downloads\runs\weights\best.pt')
+model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/YOLOv8_Training_2/runs\detect/train/weights/best.pt")
 
 # Access the webcam (use the correct index for your camera, 0 is usually the default webcam)
 cap = cv2.VideoCapture(0)
@@ -18,11 +18,11 @@ def detect_single_circle_in_roi(roi):
         blurred, 
         cv2.HOUGH_GRADIENT, 
         dp=1.2, 
-        minDist=100,  # Minimum distance between detected circles
-        param1=50,    # Higher threshold for Canny edge detector
-        param2=30,    # Accumulator threshold for circle detection
+        minDist=50,  # Minimum distance between detected circles
+        param1=18,    # Higher threshold for Canny edge detector
+        param2=20,    # Accumulator threshold for circle detection
         minRadius=20,  # Minimum radius of detected circles
-        maxRadius=100  # Maximum radius of detected circles
+        maxRadius=40  # Maximum radius of detected circles
     )
     
     # If circles are detected, return the largest one
