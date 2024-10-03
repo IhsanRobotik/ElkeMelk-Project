@@ -12,14 +12,14 @@ def main():
                      2.34191361e-03, 4.19774044e+00]) 
 
    
-    known_width_mm = 297  
+    known_width_mm = 560  
     known_pixel_width = 640 
 
     # Calculate conversion factor from pixels to mm
     conversion_factor = known_width_mm / known_pixel_width
 
     # Initialize the video capture object
-    cap = cv.VideoCapture(1)  # Change to 0 for the default camera
+    cap = cv.VideoCapture(0)  # Change to 0 for the default camera
     
     if not cap.isOpened():
         print("Cannot open camera")
@@ -47,8 +47,8 @@ def main():
         # Detect circles
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-                                   param1=40, param2=30,
-                                   minRadius=30, maxRadius=40)
+                                   param1=18, param2=20,
+                                   minRadius=19, maxRadius=25)
 
         # Draw the circles on the undistorted frame and print centers in mm
         if circles is not None:

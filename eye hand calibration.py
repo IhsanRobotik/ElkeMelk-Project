@@ -8,7 +8,7 @@ import time
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the address and port
-s.bind(("192.168.0.123", 5005))
+s.bind(("192.168.0.42", 5005))
 
 # Listen for incoming connections
 s.listen(5)
@@ -41,7 +41,7 @@ def main():
     conversion_factor = known_width_mm / known_pixel_width
 
     # Initialize the video capture object
-    cap = cv.VideoCapture(1)  # Change to 0 for the default camera
+    cap = cv.VideoCapture(0)  # Change to 0 for the default camera
     
     if not cap.isOpened():
         print("Cannot open camera")
@@ -123,7 +123,7 @@ def main():
             break
 
         elapsed_time = time.time() - start_time
-        time.sleep(max(0, 0.2 - elapsed_time))
+        #time.sleep(max(0, 0.2 - elapsed_time))
 
     cap.release()
     cv.destroyAllWindows()
