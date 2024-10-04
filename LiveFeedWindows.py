@@ -6,7 +6,7 @@ import numpy as np
 model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/YOLOv8_Training_2/runs\detect/train/weights/best.pt")
 
 # Access the webcam (use the correct index for your camera, 0 is usually the default webcam)
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 # Define a function for circle detection within the bounding box for class 17
 def detect_single_circle_in_roi(roi):
