@@ -21,8 +21,8 @@ def detect_single_circle_in_roi(roi):
         minDist=50,  # Minimum distance between detected circles
         param1=18,    # Higher threshold for Canny edge detector
         param2=20,    # Accumulator threshold for circle detection
-        minRadius=20,  # Minimum radius of detected circles
-        maxRadius=40  # Maximum radius of detected circles
+        minRadius=25,  # Minimum radius of detected circles
+        maxRadius=33  # Maximum radius of detected circles
     )
     
     # If circles are detected, return the largest one

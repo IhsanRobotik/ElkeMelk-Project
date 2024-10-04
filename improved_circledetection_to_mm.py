@@ -21,12 +21,12 @@ cv2.namedWindow("TrackBars")
 cv2.resizeWindow("TrackBars", 640, 240)
 
 # Create trackbars for HSV value adjustments
-cv2.createTrackbar("Hue Min", "TrackBars", 0, 179, empty)
-cv2.createTrackbar("Hue Max", "TrackBars", 179, 179, empty)
-cv2.createTrackbar("Sat Min", "TrackBars", 0, 255, empty)
-cv2.createTrackbar("Sat Max", "TrackBars", 14, 255, empty)
-cv2.createTrackbar("Val Min", "TrackBars", 0, 255, empty)
-cv2.createTrackbar("Val Max", "TrackBars", 201, 255, empty)
+cv2.createTrackbar("Hue Min", "TrackBars", 90, 179, empty)
+cv2.createTrackbar("Hue Max", "TrackBars", 116, 179, empty)
+cv2.createTrackbar("Sat Min", "TrackBars", 10, 255, empty)
+cv2.createTrackbar("Sat Max", "TrackBars", 45, 255, empty)
+cv2.createTrackbar("Val Min", "TrackBars", 9, 255, empty)
+cv2.createTrackbar("Val Max", "TrackBars", 255, 255, empty)
 
 # Camera matrix and distortion coefficients
 mtx = np.array([[680.43205516, 0, 325.70663487],
@@ -43,7 +43,7 @@ if not cap.isOpened():
     print("Cannot open camera")
     exit()
 
-known_width_mm = 389  
+known_width_mm = 393  
 known_pixel_width = 1080 
 
 # Calculate conversion factor from pixels to mm
@@ -92,7 +92,7 @@ while True:
     # Detect circles
     rows = gray.shape[0]
     circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, rows / 8,
-                                 param1=10, param2=15,
+                                 param1=20, param2=20,
                                  minRadius=25, maxRadius=33)
 
     # Draw the circles on the masked result

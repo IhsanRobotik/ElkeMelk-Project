@@ -12,7 +12,7 @@ def main():
                      2.34191361e-03, 4.19774044e+00]) 
 
    
-    known_width_mm = 389  
+    known_width_mm = 383  
     known_pixel_width = 640 
 
     # Calculate conversion factor from pixels to mm
