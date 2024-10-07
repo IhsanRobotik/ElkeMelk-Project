@@ -1,0 +1,25 @@
+# Define the IP address and port of the server
+server_ip = "192.168.0.45"
+server_port = 5005
+
+# Open the socket connection to the server
+socket_open(server_ip, server_port)
+
+# Read the incoming message from the server (non-blocking)
+coordinates = socket_read_string()
+textmsg("Received from server: ", coordinates)
+
+# Send confirmation to the server ("I am there")
+socket_send_string("I am there\n")
+textmsg("Sent: I am there")
+
+# Wait for the server to send back "saved it"
+response = socket_read_string()
+
+# Check if the response is "saved it" and confirm
+if response == "saved it":
+    textmsg("Received confirmation from server: ", response)
+end
+
+# Close the socket connection
+socket_close()

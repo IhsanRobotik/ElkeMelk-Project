@@ -19,33 +19,17 @@ clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
 # Stel een timeout in voor het ontvangen van gegevens om te voorkomen dat het blokkeert
-clientsocket.settimeout(1.0)
-
-previouspositionX = -184.70
-previouspositionY = -637.60
+clientsocket.settimeout(5.0)
 
 pickupX = 0
 pickupY = 0
 
-deltarobotpositionX = 0
-deltarobotpositionY = 0
+bottleXRef = 212.31
+bottleYRef = 222.36
 
-newRobotXRef = 0
-newRobotYRef = 0
+robotXRef = 185.29
+robotYRef = -500.52
 
-robotXRef = 26.02
-robotYRef = -550.07
-
-newRobotXRef = 0
-newRobotYRef = 0
-
-bottleXRef = 128.27
-bottleYRef = 69.51
-
-
-# Bekende referentiepositie van de gripper
-gripperXRef = 280.75  # De X-positie van de gripper op de grond
-gripperYRef = 343.75  # De Y-positie van de gripper op de grond
 
 # Camera matrix en distorsiecoëfficiënten
 mtx = np.array([[663.81055373, 0, 320.9241384],
@@ -55,7 +39,7 @@ mtx = np.array([[663.81055373, 0, 320.9241384],
 dist = np.array([2.75825516e-01, -1.88952738e+00, 2.27429839e-03,
                  -2.77074731e-03, 4.02307100e+00])
 
-known_width_mm = 560 
+known_width_mm = 402 
 known_pixel_width = 640 
 
 # Bereken conversiefactor van pixels naar mm
@@ -106,48 +90,54 @@ def main():
                 # Converteer pixelcoördinaten naar mm voor de fles
                 center_mm = (center_pixels[0] * conversion_factor, center_pixels[1] * conversion_factor)
 
+                bottleXRef = 212.31
+                bottleYRef = 222.36
+
+                robotXRef = 185.29
+                robotYRef = -500.52
+
                 # Bereken de delta's tussen de fles en de gripperpositie
                 deltaX = center_mm[0] - bottleXRef
                 deltaY = center_mm[1] - bottleYRef
 
-                # Ontvang de huidige coördinaten van de robot van de client
-                try:
-                    msg = clientsocket.recv(1024)
-
-                    if msg:
-                        decoded_msg = msg.decode("utf-8")
-                        cleaned_msg = decoded_msg.replace("p", "")
-                        array = ast.literal_eval(cleaned_msg)
-
-                        # array[0] is de huidige Y-coördinaat van de robot
-                        # array[1] is de huidige X-coördinaat van de robot
-
-                        # Bereken de nieuwe robot pick-up coördinaten
-                        deltarobotpositionX = (array[0] * 1000) - previouspositionX
-                        deltarobotpositionY = (array[1] * 1000) - previouspositionY                        
+                pickupX = robotXRef - deltaY
+                pickupY = robotYRef - deltaX
                         
-                        newRobotXRef = deltarobotpositionX + robotXRef  # Huidige X-coördinaat + deltaX
-                        newRobotYRef = deltarobotpositionY + robotYRef  # Huidige Y-coördinaat + deltaY
+                # Stuur de nieuwe coördinaten naar de robot
+                formatted_string = "({0}, {1})".format(pickupX, pickupY)
+                message_to_send = formatted_string  # Coordinates to send
+                clientsocket.send(bytes(message_to_send, "ascii"))
 
-                        pickupX = newRobotXRef - deltaY
-                        pickupY = newRobotYRef - deltaX
+                # Wacht op het bericht van de robot dat hij op de juiste positie is
+                robot_at_position = False
+                while not robot_at_position:
+                    try:
+                        robot_msg = clientsocket.recv(1024)
+                        if robot_msg.decode("utf-8") == "I am there":
+                            # Robot heeft de positie bereikt, sla de nieuwe coördinaten op
+                            robotXRef = pickupX
+                            robotYRef = pickupY
+                            bottleXRef = center_mm[0]
+                            bottleYRef = center_mm[1]
 
-                        # Druk de nieuwe pick-up coördinaten van de robot af
-                        robotPickUpCoord = [pickupX, pickupY]
-                        print(f"Robot Pick-Up Coordinates: {robotPickUpCoord}")
+                            print("Coordinates saved successfully!")
 
-                except socket.timeout:
-                    continue
-                except Exception as e:
-                    print(f"Error occurred: {e}")
-                    break
-
+                            # Stuur bericht terug naar de robot
+                            clientsocket.send("saved it".encode("utf-8"))
+                            robot_at_position = True
+                            print("Sent confirmation to the robot: 'saved it'. Robot can proceed.")
+                    except socket.timeout:
+                        continue
+                    except Exception as e:
+                        print(f"Error occurred: {e}")
+                        break
+                
                 # Teken de cirkel en plaats tekst
                 cv.circle(undistorted_frame, center_pixels, 1, (0, 100, 100), 3)
                 radius = i[2]
                 cv.circle(undistorted_frame, center_pixels, radius, (255, 0, 255), 3)
 
-                text = f"bottle {index + 1}: dX = {deltaX:.2f}, dY = {deltaY:.2f}"
+                text = f"{index + 1}: ({center_mm[0]:.2f}, {center_mm[1]:.2f}) mm"
                 cv.putText(undistorted_frame, text, (center_pixels[0] - 30, center_pixels[1]), 
                            cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
 
