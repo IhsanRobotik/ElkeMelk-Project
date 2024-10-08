@@ -22,14 +22,16 @@ clientsocket.settimeout(5.0)
 pickupX = 100.0  # Example coordinates
 pickupY = 200.0
 formatted_string = "({0}, {1})".format(pickupX, pickupY)
-clientsocket.send(bytes(formatted_string, "ascii"))
-print(f"Sent: {formatted_string}")
+message_to_send = formatted_string
+clientsocket.send(bytes(message_to_send, "ascii"))
+print(f"Sent: {message_to_send}")
 
 # Wait for confirmation from the robot
 robot_at_position = False
 while not robot_at_position:
     try:
         # Receive message from the robot
+        print("Waiting...")
         robot_msg = clientsocket.recv(1024)
         decoded_msg = robot_msg.decode("utf-8")
         print(f"Received message from robot: {decoded_msg}")  # Debugging statement

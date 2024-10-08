@@ -1,12 +1,12 @@
 # Define the IP address and port of the server
 server_ip = "192.168.0.45"
 server_port = 5005
-
+socket_name = "fadil"
 # Open the socket connection to the server
 socket_open(server_ip, server_port)
 
 # Read the incoming message from the server (non-blocking)
-coordinates = socket_read_string()
+coordinates = socket_read_ascii_float(2,socket_close_name)
 textmsg("Received from server: ", coordinates)
 
 # Send confirmation to the server ("I am there")

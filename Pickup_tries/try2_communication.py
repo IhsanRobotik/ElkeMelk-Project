@@ -112,6 +112,7 @@ def main():
                 while not robot_at_position:
                     try:
                         robot_msg = clientsocket.recv(1024)
+                        print("Ready to reveive")
                         decoded_msg = robot_msg.decode("utf-8")
                         print(f"Received from robot: {decoded_msg}")  # Debugging statement
                         

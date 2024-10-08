@@ -153,8 +153,26 @@ def main():
                 formatted_string = "({0}, {1})".format(pickupX, pickupY)
                 message_to_send = formatted_string  # Coordinates to send
                 clientsocket.send(bytes(message_to_send, "ascii"))
-                
-                print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")               
+                print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")
+                robot_at_position = False
+                while not robot_at_position:
+                    try:
+                        # Receive message from the robot
+                        print("hello")
+                        robot_msg = clientsocket.recv(1024)
+                        decoded_msg = robot_msg.decode("utf-8")
+                        print(f"Received message from robot: {decoded_msg}")  # Debugging statement
+                        
+                        if decoded_msg == "I am there":
+                            # Robot has reached the position, respond with "saved it"
+                            clientsocket.send("saved it".encode("utf-8"))
+                            print("Received 'I am there' and sent 'saved it'")
+                            robot_at_position = True
+                    except socket.timeout:
+                        print("Waiting for response...")
+                    except Exception as e:
+                        print(f"Error occurred: {e}")
+                        break # Exit the loop if an error occurs  
 
         # Display the undistorted frame and mask result
         cv.imshow("Detected Circles on Mask", imgResult)

@@ -78,6 +78,7 @@ def main():
     create_trackbars()
 
     while True:
+
         start_time = time.time()
 
         # Capture frame-by-frame
@@ -153,8 +154,12 @@ def main():
                 formatted_string = "({0}, {1})".format(pickupX, pickupY)
                 message_to_send = formatted_string  # Coordinates to send
                 clientsocket.send(bytes(message_to_send, "ascii"))
-                
-                print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")               
+                print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")
+                receivedMsg = clientsocket.recv(1024)
+                if not receivedMsg:  # If no message is received, break the loop
+                    break
+                confirmMsg = receivedMsg.decode("utf-8")
+                print(confirmMsg)               
 
         # Display the undistorted frame and mask result
         cv.imshow("Detected Circles on Mask", imgResult)

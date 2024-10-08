@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np
 import socket
 import time
+import ast
 
 # Create a socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,14 +18,10 @@ print("Server is listening for connections...")
 clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
-pickupX = 0
-pickupY = 0
+firstposX = 111.43
+firstposY = -500.54
 
-robotXRef = 228.60
-robotYRef = -482.63
-# Flip the bottleXRef
-bottleXRef = 186.71
-bottleYRef = 171.15
+array = [111.43, -500.54]
 
 def empty(val):
     pass
@@ -35,12 +32,12 @@ def create_trackbars():
     cv.resizeWindow("TrackBars", 640, 240)
 
     # Create trackbars for adjusting HSV filter values
-    cv.createTrackbar("Hue Min", "TrackBars", 0, 179, empty)
+    cv.createTrackbar("Hue Min", "TrackBars", 91, 179, empty)
     cv.createTrackbar("Hue Max", "TrackBars", 179, 179, empty)
-    cv.createTrackbar("Sat Min", "TrackBars", 10, 255, empty)
-    cv.createTrackbar("Sat Max", "TrackBars", 98, 255, empty)
+    cv.createTrackbar("Sat Min", "TrackBars", 5, 255, empty)
+    cv.createTrackbar("Sat Max", "TrackBars", 174, 255, empty)
     cv.createTrackbar("Val Min", "TrackBars", 0, 255, empty)
-    cv.createTrackbar("Val Max", "TrackBars", 255, 255, empty)
+    cv.createTrackbar("Val Max", "TrackBars", 135, 255, empty)
 
 def get_trackbar_values():
     # Read the current values of the trackbars
@@ -53,6 +50,7 @@ def get_trackbar_values():
     return h_min, h_max, s_min, s_max, v_min, v_max
 
 def main():
+    global array
     # Camera matrix and distortion coefficients
     mtx = np.array([[663.81055373, 0, 320.9241384],
                 [0, 663.2383916, 241.48871247],
@@ -117,7 +115,7 @@ def main():
         # Detect circles
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
-                                   param1=20, param2=20,
+                                   param1=15, param2=15,
                                    minRadius=25, maxRadius=33)
 
         # Draw the circles on the mask result and label them
@@ -144,17 +142,35 @@ def main():
                 cv.putText(imgResult, text, (center_pixels[0] - 30, center_pixels[1]), 
                            cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
                 
-                deltaX = bottleXRef - center_mm[0]
-                deltaY = bottleYRef - center_mm[1]
+
+                deltaY = (-1) * center_mm[0]
+                deltaX = (-1) * center_mm[1]
+
+                pickupX =  deltaX + 395.2 + ((firstposX - array[0]) * (-1))
+                pickupY =  deltaY + -293.67 + ((firstposY - array[1]) * (-1))
+
+                msg = clientsocket.recv(1024)
                 
-                pickupX = robotXRef + deltaY
-                pickupY = robotYRef + deltaX
+                if not msg:  # If no message is received, break the loop
+                    break
+
+                msg = (msg.decode("utf-8"))
+                if (msg == "trig"):
+                    formatted_string = "({0}, {1})".format(pickupX, pickupY)
+                    message_to_send = formatted_string  # Coordinates to send
+                    clientsocket.send(bytes(message_to_send, "ascii"))
+                    print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")                  
+
+                else:
+                    cleaned_msg = msg.replace("p", "")
+                    array = ast.literal_eval(cleaned_msg)
+                    array[0] = array[0] * 1000
+                    array[1] = array[1] * 1000
+                    print(array[0])
+                    print(array[1])
                 
-                formatted_string = "({0}, {1})".format(pickupX, pickupY)
-                message_to_send = formatted_string  # Coordinates to send
-                clientsocket.send(bytes(message_to_send, "ascii"))
+                    
                 
-                print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")               
 
         # Display the undistorted frame and mask result
         cv.imshow("Detected Circles on Mask", imgResult)
