@@ -32,12 +32,12 @@ def create_trackbars():
     cv.resizeWindow("TrackBars", 640, 240)
 
     # Create trackbars for adjusting HSV filter values
-    cv.createTrackbar("Hue Min", "TrackBars", 91, 179, empty)
-    cv.createTrackbar("Hue Max", "TrackBars", 179, 179, empty)
-    cv.createTrackbar("Sat Min", "TrackBars", 5, 255, empty)
-    cv.createTrackbar("Sat Max", "TrackBars", 174, 255, empty)
+    cv.createTrackbar("Hue Min", "TrackBars", 40, 179, empty)
+    cv.createTrackbar("Hue Max", "TrackBars", 174, 179, empty)
+    cv.createTrackbar("Sat Min", "TrackBars", 9, 255, empty)
+    cv.createTrackbar("Sat Max", "TrackBars", 249, 255, empty)
     cv.createTrackbar("Val Min", "TrackBars", 0, 255, empty)
-    cv.createTrackbar("Val Max", "TrackBars", 135, 255, empty)
+    cv.createTrackbar("Val Max", "TrackBars", 255, 255, empty)
 
 def get_trackbar_values():
     # Read the current values of the trackbars
