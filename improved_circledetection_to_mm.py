@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import cv2 as cv
 
 def empty(a):
     pass
@@ -21,12 +22,12 @@ cv2.namedWindow("TrackBars")
 cv2.resizeWindow("TrackBars", 640, 240)
 
 # Create trackbars for HSV value adjustments
-cv2.createTrackbar("Hue Min", "TrackBars", 43, 179, empty)
-cv2.createTrackbar("Hue Max", "TrackBars", 111, 179, empty)
-cv2.createTrackbar("Sat Min", "TrackBars", 6, 255, empty)
-cv2.createTrackbar("Sat Max", "TrackBars", 53, 255, empty)
-cv2.createTrackbar("Val Min", "TrackBars", 48, 255, empty)
-cv2.createTrackbar("Val Max", "TrackBars", 173, 255, empty)
+cv2.createTrackbar("Hue Min", "TrackBars", 29, 179, empty)
+cv2.createTrackbar("Hue Max", "TrackBars", 142, 179, empty)
+cv2.createTrackbar("Sat Min", "TrackBars", 8, 255, empty)
+cv2.createTrackbar("Sat Max", "TrackBars", 36, 255, empty)
+cv2.createTrackbar("Val Min", "TrackBars", 0, 255, empty)
+cv2.createTrackbar("Val Max", "TrackBars", 255, 255, empty)
 
 # Camera matrix and distortion coefficients
 mtx = np.array([[680.43205516, 0, 325.70663487],
@@ -89,6 +90,10 @@ while True:
     gray = cv2.cvtColor(imgResult, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 5)
 
+    # ** Now applying the circle detection on the mask result, not the undistorted frame **
+    gray = cv.cvtColor(imgResult, cv.COLOR_BGR2GRAY)
+    gray = cv.medianBlur(gray, 5)
+
     # Detect circles
     rows = gray.shape[0]
     circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, rows / 8,
@@ -105,15 +110,15 @@ while True:
             center_mm = (center_pixels[0] * conversion_factor, center_pixels[1] * conversion_factor)
 
             # Circle center
-            cv2.circle(imgResult, center_pixels, 1, (0, 100, 100), 3)
+            cv2.circle(imgResult, center_pixels, 1, (0, 255, 0), 3)
             # Circle outline
             radius = i[2]
-            cv2.circle(imgResult, center_pixels, radius, (255, 0, 255), 3)
+            cv2.circle(imgResult, center_pixels, radius, (0, 255, 0), 3)
 
             # Put text with circle number and center in mm
             text = f"bottle {index + 1}: ({center_mm[0]:.2f}, {center_mm[1]:.2f}) mm"
             cv2.putText(imgResult, text, (center_pixels[0] - 30, center_pixels[1]), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
     # Display the original and processed frames
     cv2.imshow("Original Video", frame)
