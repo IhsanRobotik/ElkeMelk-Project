@@ -38,7 +38,7 @@ dist = np.array([2.86943840e-01, -1.81250009e+00, -9.85433600e-03,
                  2.34191361e-03, 4.19774044e+00]) 
 
 # Initialize the video capture object
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 if not cap.isOpened():
     print("Cannot open camera")

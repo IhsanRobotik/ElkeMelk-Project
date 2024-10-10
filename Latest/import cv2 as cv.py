@@ -120,49 +120,59 @@ def main():
         rows = gray.shape[0]
         circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, 1, rows / 8,
                                   param1=15, param2=15,
-                                  minRadius=35, maxRadius=40)
-        
-        
+                                  minRadius=35, maxRadius=40) 
 
+        roi_x, roi_y, roi_w, roi_h = 0, 285, 1280, 150  # Adjust these values as needed
+        cv.rectangle(imgResult, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (0, 255, 0), 2)
+        
         if circles is not None:
             circles = np.uint16(np.around(circles))
 
-            # Sort circles based on their y-coordinates, and group by rows
-            row_threshold = 50  # Adjust this threshold based on row height
-            circles_sorted = sorted(circles[0, :], key=lambda x: x[1])
+            # Filter circles that are within the defined ROI
+            circles_in_roi = []
+            for circle in circles[0, :]:
+                center_x, center_y, radius = circle[0], circle[1], circle[2]
+                # Check if the circle's center is within the specified ROI
+                if roi_x <= center_x <= roi_x + roi_w and roi_y <= center_y <= roi_y + roi_h:
+                    circles_in_roi.append(circle)
 
-            # Group circles by rows
-            grouped_circles = []
-            current_row = [circles_sorted[0]]
-            for i in range(1, len(circles_sorted)):
-                if abs(circles_sorted[i][1] - circles_sorted[i - 1][1]) <= row_threshold:
-                    current_row.append(circles_sorted[i])
-                else:
-                    grouped_circles.append(current_row)
-                    current_row = [circles_sorted[i]]
-            grouped_circles.append(current_row)
+            # Continue processing only the circles that are inside the ROI
+            if len(circles_in_roi) > 0:
+                # Sort circles based on their y-coordinates, and group by rows
+                row_threshold = 50  # Adjust this threshold based on row height
+                circles_sorted = sorted(circles_in_roi, key=lambda x: x[1])
 
-            # Process only the first circle
-            if len(grouped_circles) > 0:
-                first_row = grouped_circles[0]  # Get the first row
-                first_circle = sorted(first_row, key=lambda x: x[0])[0]  # Leftmost circle in the first row
+                # Group circles by rows
+                grouped_circles = []
+                current_row = [circles_sorted[0]]
+                for i in range(1, len(circles_sorted)):
+                    if abs(circles_sorted[i][1] - circles_sorted[i - 1][1]) <= row_threshold:
+                        current_row.append(circles_sorted[i])
+                    else:
+                        grouped_circles.append(current_row)
+                        current_row = [circles_sorted[i]]
+                grouped_circles.append(current_row)
 
-                # Get the center of the first circle
-                center_pixels = (first_circle[0], first_circle[1])
+                # Process only the first circle in the first row
+                if len(grouped_circles) > 0:
+                    first_row = grouped_circles[0]  # Get the first row
+                    first_circle = sorted(first_row, key=lambda x: -x[0])[0]  # Leftmost circle in the first row
 
-                # Convert pixel coordinates to mm
-                center_mm = (center_pixels[0] * conversion_factor, center_pixels[1] * conversion_factor)
+                    # Get the center of the first circle
+                    center_pixels = (first_circle[0], first_circle[1])
 
-                # Circle center
-                cv.circle(imgResult, center_pixels, 1, (0, 100, 100), 3)
-                # Circle outline
-                radius = first_circle[2]
-                cv.circle(imgResult, center_pixels, radius, (255, 0, 255), 3)
+                    # Convert pixel coordinates to mm (optional)
+                    center_mm = (center_pixels[0] * conversion_factor, center_pixels[1] * conversion_factor)
 
-                # Put text with circle number and center in mm
-                text = f"1: ({center_mm[0]:.2f}, {center_mm[1]:.2f}) mm"
-                cv.putText(imgResult, text, (center_pixels[0] - 30, center_pixels[1]),
-                           cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+                    # Draw the circle center and outline on imgResult
+                    cv.circle(imgResult, center_pixels, 1, (0, 100, 100), 3)  # Circle center
+                    radius = first_circle[2]
+                    cv.circle(imgResult, center_pixels, radius, (255, 0, 255), 3)  # Circle outline
+
+                    # Display text with circle number and center in mm (optional)
+                    text = f"1: ({center_mm[0]:.2f}, {center_mm[1]:.2f}) mm"
+                    cv.putText(imgResult, text, (center_pixels[0] - 30, center_pixels[1]),
+                            cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
                 # Compute robot coordinates for the first circle
                 deltaY = (-1) * center_mm[0]
