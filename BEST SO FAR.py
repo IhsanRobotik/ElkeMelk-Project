@@ -5,16 +5,16 @@ import ast
 import cv2
 
 # Create a socket object
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# # Bind the socket to the address and port
-# s.bind(("192.168.0.45", 5005))
+# Bind the socket to the address and port
+s.bind(("192.168.0.1", 5005))
 
-# # Listen for incoming connections
-# s.listen(5)
-# # Accept a connection from a client
-# clientsocket, address = s.accept()
-# print(f"Connection from {address} has been established!")
+# Listen for incoming connections
+s.listen(5)
+# Accept a connection from a client
+clientsocket, address = s.accept()
+print(f"Connection from {address} has been established!")
 
 bottlecoordsX = 295.70
 bottlecoordsY = 170.70
@@ -157,29 +157,29 @@ def main():
                 pickupX =  deltaX + offsetX + ((firstposX - array[0]) * (-1))
                 pickupY =  deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
-                # msg = clientsocket.recv(1024)
+                msg = clientsocket.recv(1024)
                 
-                # if not msg:  # If no message is received, break the loop
-                #     break
-                # msg = (msg.decode("utf-8"))
-                # print(msg)
+                if not msg:  # If no message is received, break the loop
+                    break
+                msg = (msg.decode("utf-8"))
+                print(msg)
 
-                # if "trig" in msg:
-                #     formatted_string = "({0}, {1})".format(pickupX, pickupY)
-                #     message_to_send = formatted_string  # Coordinates to send
-                #     clientsocket.send(bytes(message_to_send, "ascii"))
-                #     print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")                  
+                if "trig" in msg:
+                    formatted_string = "({0}, {1})".format(pickupX, pickupY)
+                    message_to_send = formatted_string  # Coordinates to send
+                    clientsocket.send(bytes(message_to_send, "ascii"))
+                    print(f"Circle {index + 1} - Coordinate: ({center_mm[0]:.2f}, {center_mm[1]:.2f}), Robot Pick-Up Coordinate: ({pickupX:.2f}, {pickupY:.2f})")                  
 
-                # elif "p" in msg:
-                #     cleaned_msg = msg.replace("p", "")
-                #     cleaned_msg = cleaned_msg.replace("trig", "")
-                #     print("this is cleaned msg", cleaned_msg)
-                #     array = ast.literal_eval(cleaned_msg)
-                #     array[0] = array[0] * 1000
-                #     array[1] = array[1] * 1000
+                elif "p" in msg:
+                    cleaned_msg = msg.replace("p", "")
+                    cleaned_msg = cleaned_msg.replace("trig", "")
+                    print("this is cleaned msg", cleaned_msg)
+                    array = ast.literal_eval(cleaned_msg)
+                    array[0] = array[0] * 1000
+                    array[1] = array[1] * 1000
 
-                # else: 
-                #     break
+                else: 
+                    break
 
         # Display the undistorted frame and mask result
         cv.imshow("Detected Circles on Mask", imgResult)

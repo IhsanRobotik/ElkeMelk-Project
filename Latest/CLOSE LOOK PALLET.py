@@ -17,17 +17,17 @@ s.listen(5)
 clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
-bottlecoordsX = 295.70
-bottlecoordsY = 170.70
+bottlecoordsX = 152.16
+bottlecoordsY = 94.07
 
-robotcoordsX = 247.25
-robotcoordsY = -487.20
+robotcoordsX = 133.90
+robotcoordsY = -908.72
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-firstposX = -134.82
-firstposY = -500.54
+firstposX = 275.18
+firstposY = -913.11
 
 array = [firstposX, firstposY]
 
@@ -42,11 +42,11 @@ def create_trackbars():
     cv.resizeWindow("TrackBars", 640, 240)
 
     # Create trackbars for adjusting HSV filter values
-    cv2.createTrackbar("Hue Min", "TrackBars", 15, 179, empty)
-    cv2.createTrackbar("Hue Max", "TrackBars", 179, 179, empty)
-    cv2.createTrackbar("Sat Min", "TrackBars", 10, 255, empty)
-    cv2.createTrackbar("Sat Max", "TrackBars", 52, 255, empty)
-    cv2.createTrackbar("Val Min", "TrackBars", 0, 255, empty)
+    cv2.createTrackbar("Hue Min", "TrackBars", 0, 179, empty)
+    cv2.createTrackbar("Hue Max", "TrackBars", 177, 179, empty)
+    cv2.createTrackbar("Sat Min", "TrackBars", 0, 255, empty)
+    cv2.createTrackbar("Sat Max", "TrackBars", 26, 255, empty)
+    cv2.createTrackbar("Val Min", "TrackBars", 130, 255, empty)
     cv2.createTrackbar("Val Max", "TrackBars", 255, 255, empty)
 
 def get_trackbar_values():
@@ -180,11 +180,11 @@ def main():
                             cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
                 # Compute robot coordinates for the first circle
-                deltaY = (-1) * center_mm[0]
-                deltaX = (-1) * center_mm[1]
+                # deltaY = (-1) * center_mm[0]
+                # deltaX = (-1) * center_mm[1]
 
-                pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
-                pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
+                # pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
+                # pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
                 msg = clientsocket.recv(1024)
                 
@@ -194,6 +194,12 @@ def main():
                 print(msg)
 
                 if "trig" in msg:
+                    deltaY = (-1) * center_mm[0]
+                    deltaX = (-1) * center_mm[1]
+
+                    pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
+                    pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
+
                     formatted_string = "({0}, {1})".format(pickupX, pickupY)
                     message_to_send = formatted_string  # Coordinates to send
                     clientsocket.send(bytes(message_to_send, "ascii"))
@@ -215,6 +221,7 @@ def main():
         #     counter = counter + 1
         #     if counter > 15:
         #         clientsocket.send(bytes("nextRow", "ascii"))
+        # time.sleep(1)
                 
         # Display the result for the detected circles
         cv.imshow("Detected Circle 1", imgResult)

@@ -8,30 +8,66 @@ import time
 host = '192.168.0.43'
 port = 30001
 
-# Function to send a script to the robot
 def send_script_to_robot(script_text, host, port):
     # Create a socket connection to the robot
     mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     mySocket.connect((host, port))
-    
-    # Send the script to the robot
-    mySocket.send((script_text + "\n").encode())
-    
-    # Close the socket connection
+    mySocket.send((script_text + "\n").encode())  # Send the script to the robot
     mySocket.close()
 
+# Function to listen for a message from the robot
+def listen_for_robot_ready(laptop_ip, laptop_port):
+    # Create a socket to listen for robot's message
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((laptop_ip, laptop_port))
+    server_socket.listen(1)  # Listen for 1 connection
+    print("Waiting for robot to send ready message...")
 
-# # Create a socket object
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Accept the connection from the robot
+    connection, addr = server_socket.accept()
+    print(f"Connected to robot at {addr}")
 
-# # Bind the socket to the address and port
-# s.bind(("192.168.0.1", 5005))
+    # Receive the message from the robot
+    ready_message = connection.recv(1024).decode()  # Buffer size is 1024 bytes
+    print(f"Message from robot: {ready_message}")
 
-# # Listen for incoming connections
-# s.listen(5)
-# # Accept a connection from a client
-# clientsocket, address = s.accept()
-# print(f"Connection from {address} has been established!")
+    # Close the connection
+    connection.close()
+
+    # If the robot says "ready", return True
+    if ready_message == "ready":
+        return True
+    return False
+
+# Define the robot's IP and port
+host = '192.168.0.43'  # Robot IP
+robot_port = 30001     # Robot port for sending script
+laptop_ip = '192.168.0.1'  # Laptop IP (use your laptop's IP here)
+laptop_port = 50005    # Port to listen for robot message
+
+scriptMsg = f"""
+def msg():
+    # Open a socket to the laptop
+    socket_open("{laptop_ip}", {laptop_port}, "socket_name")
+    
+    # Send a "ready" message to the laptop after movement
+    socket_send_string("ready", "socket_name")
+    
+    # Close the socket
+    socket_close("socket_name")
+end
+"""
+send_script_to_robot(scriptMsg, host, robot_port)
+
+script0 = f"""
+def moveToFirstPos():
+    movel (p[-0.13482, -0.500521, 0.562753, -2.26491, 2.14446, -0.01273])
+    sleep(0.1)
+    set_digital_out(0,True)
+end
+"""
+send_script_to_robot(script0, host, robot_port)
+print("im here")
 
 bottlecoordsX = 70.94
 bottlecoordsY = 89.45
@@ -202,36 +238,23 @@ def main():
                 pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
                 pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
-                msg = clientsocket.recv(1024)
-                
-                if not msg:  # If no message is received, break the loop
-                    break
-                msg = (msg.decode("utf-8"))
-                print(msg)
-
-                if "trig" in msg:
-                    formatted_string = "({0}, {1})".format(pickupX, pickupY)
-                    message_to_send = formatted_string  # Coordinates to send
-                    clientsocket.send(bytes(message_to_send, "ascii"))
-                    print("Robot Pick-Up Coordinate:", pickupX, pickupY)                  
-
-                elif "p" in msg:
-                    cleaned_msg = msg.replace("p", "")
-                    cleaned_msg = cleaned_msg.replace("trig", "")
-                    print("this is cleaned msg", cleaned_msg)
-                    array = ast.literal_eval(cleaned_msg)
-                    array[0] = array[0] * 1000
-                    array[1] = array[1] * 1000
-                    global counter 
-                    counter = 0
-
-                else: 
-                    break
-        else:
-            counter = counter + 1
-            if counter > 15:
-                clientsocket.send(bytes("nextRow", "ascii"))
-                print("next row")
+                print("2")
+                script1 = f"""
+                def test_move():
+                    a=get_actual_tcp_pose()
+                    movel (p[{pickupX}, {pickupY}, 0.35, a[3], a[4], a[5]], 0.3, 0.5)
+                    movel (p[{pickupX}, {pickupY}, 0.241, a[3], a[4], a[5]])
+                    sleep(0.1)
+                    set_digital_out(0,False)
+                    movel (p[{pickupX}, {pickupY}, 0.590, a[3], a[4], a[5]])
+                    sleep(0.1)
+                    movel ({pickupX + 0.140}, {pickupY}, 0.562753, a[3], a[4], a[5]], 0.3, 0.5)
+                    sleep(0.1)
+                    set_digital_out(0,True)
+                end
+                """
+                send_script_to_robot(script1, host, robot_port)   
+                time.sleep(5)
                 
         # Display the result for the detected circles
         cv.imshow("Detected Circle 1", imgResult)

@@ -5,29 +5,29 @@ import ast
 import cv2
 import time
 
-# Create a socket object
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# # Create a socket object
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
-print("listening for connection")
-# Listen for incoming connections
-s.listen(5)
-# Accept a connection from a client
-clientsocket, address = s.accept()
-print(f"Connection from {address} has been established!")
+# # Bind the socket to the address and port
+# s.bind(("192.168.0.1", 5005))
+# print("listening for connection")
+# # Listen for incoming connections
+# s.listen(5)
+# # Accept a connection from a client
+# clientsocket, address = s.accept()
+# print(f"Connection from {address} has been established!")
 
-bottlecoordsX = 295.70
-bottlecoordsY = 170.70
+bottlecoordsX = 152.16
+bottlecoordsY = 94.07
 
-robotcoordsX = 247.25
-robotcoordsY = -487.20
+robotcoordsX = 133.90
+robotcoordsY = -908.72
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-firstposX = -134.82
-firstposY = -500.54
+firstposX = 275.18
+firstposY = -913.11
 
 array = [firstposX, firstposY]
 
@@ -42,11 +42,11 @@ def create_trackbars():
     cv.resizeWindow("TrackBars", 640, 240)
 
     # Create trackbars for adjusting HSV filter values
-    cv2.createTrackbar("Hue Min", "TrackBars", 15, 179, empty)
-    cv2.createTrackbar("Hue Max", "TrackBars", 179, 179, empty)
-    cv2.createTrackbar("Sat Min", "TrackBars", 10, 255, empty)
-    cv2.createTrackbar("Sat Max", "TrackBars", 52, 255, empty)
-    cv2.createTrackbar("Val Min", "TrackBars", 0, 255, empty)
+    cv2.createTrackbar("Hue Min", "TrackBars", 0, 179, empty)
+    cv2.createTrackbar("Hue Max", "TrackBars", 177, 179, empty)
+    cv2.createTrackbar("Sat Min", "TrackBars", 0, 255, empty)
+    cv2.createTrackbar("Sat Max", "TrackBars", 26, 255, empty)
+    cv2.createTrackbar("Val Min", "TrackBars", 130, 255, empty)
     cv2.createTrackbar("Val Max", "TrackBars", 255, 255, empty)
 
 def get_trackbar_values():
@@ -186,35 +186,37 @@ def main():
                 pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
                 pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
-                msg = clientsocket.recv(1024)
+        #         msg = clientsocket.recv(1024)
                 
-                if not msg:  # If no message is received, break the loop
-                    break
-                msg = (msg.decode("utf-8"))
-                print(msg)
+        #         if not msg:  # If no message is received, break the loop
+        #             break
+        #         msg = (msg.decode("utf-8"))
+        #         print(msg)
 
-                if "trig" in msg:
-                    formatted_string = "({0}, {1})".format(pickupX, pickupY)
-                    message_to_send = formatted_string  # Coordinates to send
-                    clientsocket.send(bytes(message_to_send, "ascii"))
-                    print("Robot Pick-Up Coordinate:", pickupX, pickupY)                  
+        #         if "trig" in msg:
+        #             formatted_string = "({0}, {1})".format(pickupX, pickupY)
+        #             message_to_send = formatted_string  # Coordinates to send
+        #             clientsocket.send(bytes(message_to_send, "ascii"))
+        #             print("Robot Pick-Up Coordinate:", pickupX, pickupY)                  
 
-                elif "p" in msg:
-                    cleaned_msg = msg.replace("p", "")
-                    cleaned_msg = cleaned_msg.replace("trig", "")
-                    print("this is cleaned msg", cleaned_msg)
-                    array = ast.literal_eval(cleaned_msg)
-                    array[0] = array[0] * 1000
-                    array[1] = array[1] * 1000
-                    global counter 
-                    counter = 0
+        #         elif "p" in msg:
+        #             cleaned_msg = msg.replace("p", "")
+        #             cleaned_msg = cleaned_msg.replace("trig", "")
+        #             print("this is cleaned msg", cleaned_msg)
+        #             array = ast.literal_eval(cleaned_msg)
+        #             array[0] = array[0] * 1000
+        #             array[1] = array[1] * 1000
+        #             global counter 
+        #             counter = 0
 
-                else: 
-                    break
+        #         else: 
+        #             break
+        
         # else:
         #     counter = counter + 1
-        #     if counter > 15:
-        #         clientsocket.send(bytes("nextRow", "ascii"))
+        #     if counter > 25:
+        #         print("send 69")
+        #         clientsocket.send(bytes("(69)", "ascii")) 
                 
         # Display the result for the detected circles
         cv.imshow("Detected Circle 1", imgResult)
