@@ -4,7 +4,6 @@ import socket
 import ast
 import cv2
 import time
-
 # Create a socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -215,6 +214,7 @@ def main():
             counter = counter + 1
             if counter > 15:
                 clientsocket.send(bytes("nextRow", "ascii"))
+                print("next row")
                 
         # Display the result for the detected circles
         cv.imshow("Detected Circle 1", imgResult)

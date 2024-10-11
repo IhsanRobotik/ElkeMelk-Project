@@ -5,17 +5,33 @@ import ast
 import cv2
 import time
 
-# Create a socket object
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = '192.168.0.43'
+port = 30001
 
-# Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
+# Function to send a script to the robot
+def send_script_to_robot(script_text, host, port):
+    # Create a socket connection to the robot
+    mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    mySocket.connect((host, port))
+    
+    # Send the script to the robot
+    mySocket.send((script_text + "\n").encode())
+    
+    # Close the socket connection
+    mySocket.close()
 
-# Listen for incoming connections
-s.listen(5)
-# Accept a connection from a client
-clientsocket, address = s.accept()
-print(f"Connection from {address} has been established!")
+
+# # Create a socket object
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# # Bind the socket to the address and port
+# s.bind(("192.168.0.1", 5005))
+
+# # Listen for incoming connections
+# s.listen(5)
+# # Accept a connection from a client
+# clientsocket, address = s.accept()
+# print(f"Connection from {address} has been established!")
 
 bottlecoordsX = 70.94
 bottlecoordsY = 89.45
@@ -30,6 +46,8 @@ firstposX = -134.82
 firstposY = -500.54
 
 array = [firstposX, firstposY]
+
+counter = 0
 
 def empty(val):
     pass
@@ -158,7 +176,8 @@ def main():
                 # Process only the first circle in the first row
                 if len(grouped_circles) > 0:
                     first_row = grouped_circles[0]  # Get the first row
-                    first_circle = sorted(first_row, key=lambda x: -x[0])[0]  # Leftmost circle in the first row
+                    first_circle = sorted(first_row, key=lambda x: x[0], reverse=True)[0]  # Rightmost circle in the first row
+
 
                     # Get the center of the first circle
                     center_pixels = (first_circle[0], first_circle[1])
@@ -203,10 +222,17 @@ def main():
                     array = ast.literal_eval(cleaned_msg)
                     array[0] = array[0] * 1000
                     array[1] = array[1] * 1000
+                    global counter 
+                    counter = 0
 
                 else: 
                     break
-        
+        else:
+            counter = counter + 1
+            if counter > 15:
+                clientsocket.send(bytes("nextRow", "ascii"))
+                print("next row")
+                
         # Display the result for the detected circles
         cv.imshow("Detected Circle 1", imgResult)
         # cv.imshow("Normal feed", undistorted_frame)
