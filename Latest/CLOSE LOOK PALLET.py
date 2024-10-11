@@ -180,11 +180,11 @@ def main():
                             cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
                 # Compute robot coordinates for the first circle
-                # deltaY = (-1) * center_mm[0]
-                # deltaX = (-1) * center_mm[1]
+                deltaY = (-1) * center_mm[0]
+                deltaX = (-1) * center_mm[1]
 
-                # pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
-                # pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
+                pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
+                pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
                 msg = clientsocket.recv(1024)
                 
@@ -194,12 +194,6 @@ def main():
                 print(msg)
 
                 if "trig" in msg:
-                    deltaY = (-1) * center_mm[0]
-                    deltaX = (-1) * center_mm[1]
-
-                    pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
-                    pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
-
                     formatted_string = "({0}, {1})".format(pickupX, pickupY)
                     message_to_send = formatted_string  # Coordinates to send
                     clientsocket.send(bytes(message_to_send, "ascii"))
