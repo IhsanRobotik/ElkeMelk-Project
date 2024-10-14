@@ -64,10 +64,9 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
     if not cap.isOpened():
         return -1
-    roi_x, roi_y, roi_w, roi_h = 0, 260, 1280, 200  # Define the ROI coordinates
+    roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
 
     while True:
-        # Capture frame-by-frame
         ret, frame = cap.read()
 
         if not ret:
@@ -97,7 +96,7 @@ def main():
         cv.rectangle(annotated_frame, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (0, 255, 0), 2)
 
         # Initialize variables to track the leftmost object
-        leftmost_x = float('inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
+        leftmost_x = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
         leftmost_center = None
 
         # Iterate over the results and find the leftmost detected object
@@ -112,14 +111,14 @@ def main():
                 
                 # Calculate the center point
                 center_x = (x1 + x2) / 2
-                center_y = (y1 + y2) / 2 + 260  # Adjust y-coordinate as needed
+                center_y = (y1 + y2) / 2 + 240  # Adjust y-coordinate as needed
                 cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
                 # Debugging: Print each box's coordinates and its center
                 # print(f"Object {i}: Bounding Box = ({x1}, {y1}, {x2}, {y2}), Center = ({center_x}, {center_y})")
 
                 # Check if this object is the leftmost one
-                if center_x < leftmost_x:
+                if center_x > leftmost_x:
                     # print(f"New leftmost object found at ({center_x}, {center_y})")
                     leftmost_x = center_x
                     leftmost_center = (center_x, center_y)
