@@ -65,7 +65,7 @@ def main():
     if not cap.isOpened():
         return -1
     roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
-
+    
     while True:
         ret, frame = cap.read()
 
