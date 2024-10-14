@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 1
+camera = 0
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -18,17 +18,17 @@ model = YOLO('ah.pt')   # Replace 'ah.pt' with your trained model
 # Set the model to use the GPU
 model.to(device)
 
-# Create a socket object
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# # Create a socket object
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
-print("listening for connection")
-# Listen for incoming connections
-s.listen(5)
-# Accept a connection from a client
-clientsocket, address = s.accept()
-print(f"Connection from {address} has been established!")
+# # Bind the socket to the address and port
+# s.bind(("192.168.0.45", 5005))
+# print("listening for connection")
+# # Listen for incoming connections
+# s.listen(5)
+# # Accept a connection from a client
+# clientsocket, address = s.accept()
+# print(f"Connection from {address} has been established!")
 
 bottlecoordsX = 112.84
 bottlecoordsY = 87.78
@@ -65,7 +65,7 @@ def main():
     if not cap.isOpened():
         return -1
     roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
-    
+
     while True:
         ret, frame = cap.read()
 
@@ -126,7 +126,7 @@ def main():
         # Output the leftmost object's center
         if leftmost_center:
             print(f"Leftmost object center: {leftmost_center}")
-            time.sleep(1)
+            # time.sleep(1)
 
             # print(f"Leftmost detected object center: {leftmost_center}")
             realX = leftmost_center[0] * conversion_factor
@@ -138,41 +138,42 @@ def main():
             pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
+            # print(f"bottle coords:{realX},{realY}")
             print(f"robot coords:{pickupX},{pickupY}")
 
-
-            msg = clientsocket.recv(1024)
             
-            if not msg:  # If no message is received, break the loop
-                break
-            msg = (msg.decode("utf-8"))
-            print(msg)
+        #     msg = clientsocket.recv(1024)
+            
+        #     if not msg:  # If no message is received, break the loop
+        #         break
+        #     msg = (msg.decode("utf-8"))
+        #     print(msg)
 
-            if "trig" in msg:
-                formatted_string = "({0}, {1})".format(pickupX, pickupY)
-                message_to_send = formatted_string  # Coordinates to send
-                clientsocket.send(bytes(message_to_send, "ascii"))
-                print("Robot Pick-Up Coordinate:", pickupX, pickupY)                  
+        #     if "trig" in msg:
+        #         formatted_string = "({0}, {1})".format(pickupX, pickupY)
+        #         message_to_send = formatted_string  # Coordinates to send
+        #         clientsocket.send(bytes(message_to_send, "ascii"))
+        #         print("Robot Pick-Up Coordinate:", pickupX, pickupY)                  
 
-            elif "p" in msg:
-                cleaned_msg = msg.replace("p", "")
-                cleaned_msg = cleaned_msg.replace("trig", "")
-                print("this is cleaned msg", cleaned_msg)
-                array = ast.literal_eval(cleaned_msg)
-                array[0] = array[0] * 1000
-                array[1] = array[1] * 1000
-                global counter 
-                counter = 0
+        #     elif "p" in msg:
+        #         cleaned_msg = msg.replace("p", "")
+        #         cleaned_msg = cleaned_msg.replace("trig", "")
+        #         print("this is cleaned msg", cleaned_msg)
+        #         array = ast.literal_eval(cleaned_msg)
+        #         array[0] = array[0] * 1000
+        #         array[1] = array[1] * 1000
+        #         global counter 
+        #         counter = 0
 
-            else: 
-                break
+        #     else: 
+        #         break
 
-        else:
-            counter = counter + 1
-            print("counter")
-            if counter > 25:
-                print("send 69")
-                clientsocket.send(bytes("(69)", "ascii")) 
+        # else:
+        #     counter = counter + 1
+        #     print("counter")
+        #     if counter > 25:
+        #         print("send 69")
+        #         clientsocket.send(bytes("(69)", "ascii")) 
 
         # Display the result for the detected circles
         x,y,w,h = roi
