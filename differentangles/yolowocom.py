@@ -64,7 +64,7 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
     if not cap.isOpened():
         return -1
-    roi_x, roi_y, roi_w, roi_h = 0, 260, 1280, 200  # Define the ROI coordinates
+    roi_x, roi_y, roi_w, roi_h = 400, 0, 210, 720  # Define the ROI coordinates
 
     while True:
         # Capture frame-by-frame
@@ -111,8 +111,8 @@ def main():
                     continue  # Skip this box if something is wrong
                 
                 # Calculate the center point
-                center_x = (x1 + x2) / 2
-                center_y = (y1 + y2) / 2 + 260  # Adjust y-coordinate as needed
+                center_x = (x1 + x2) / 2 + 400
+                center_y = (y1 + y2) / 2  # Adjust y-coordinate as needed
                 cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
                 # Debugging: Print each box's coordinates and its center
@@ -138,7 +138,7 @@ def main():
 
             pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
-            print(f"mm coords:{realX},{realY}")
+
             # print(f"mm coords:{realX},{realY}")
             
             # print(f"robot coords:{pickupX},{pickupY}")
