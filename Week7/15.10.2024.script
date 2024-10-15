@@ -1,0 +1,77 @@
+#textmsg(get_actual_tcp_pose())
+
+port = 5005
+ip = "192.168.0.45"
+socket_name = "fadil"
+
+incrementXAxis = 0
+
+socket = socket_open(ip, port, socket_name)
+firstPos=(p[0.275194, -0.913127, 0.726397, 2.27874, -2.1574, 0.0146628])
+movel(firstPos)
+
+sleep(0.1)
+set_digital_out(0,True)
+socket_send_string("trig", socket_name)
+
+while(True):
+
+    receive = socket_read_ascii_float(2, socket_name)
+
+    if receive[1] == 69:
+        textmsg("IM GOING TO NEXT ROW")
+        incrementXAxis=incrementXAxis + 0.06587
+        nextXPos=firstPos[0] + incrementXAxis
+
+        movel (p[nextXPos, firstPos[1], firstPos[2], firstPos[3], firstPos[4], firstPos[5]])
+
+        socket_send_string(get_actual_tcp_pose(), socket_name)
+
+        socket_send_string("trig", socket_name)
+        receive = socket_read_ascii_float(2, socket_name)
+
+    elif receive[1] == 2000:
+        textmsg("grab the carton")
+        # go to midle of carton
+        # movel(p[  ])
+        # set_digital_out(1,True)
+    
+        # # move carton upwards
+        # movel(p[   ])
+
+        # # move carton to the side?
+        # # movel and movej?
+    
+        # set_digital_out(1, False)
+    
+        # # go back to original pos and descent z axis by (bottle + carboard height) 
+        # firstPos[2] = firstPos[2] - 0.245
+        # movel(firstPos)
+
+    else:
+        textmsg(receive)
+
+        a=get_actual_tcp_pose()
+
+        x= receive[1] / 1000
+        y= receive[2] / 1000
+        z= 0.39325
+
+        movel (p[x, y, 0.50, a[3], a[4], a[5]])
+        movel (p[x, y, z, a[3], a[4], a[5]])
+
+        set_digital_out(0,False)
+
+        movel (p[x, y, 0.660, a[3], a[4], a[5]])
+        sleep(0.1)
+        set_digital_out(0,True)
+
+        movel (p[x+0.140, y+0.075, a[2], a[3], a[4], a[5]], 0.3, 0.5)
+
+        socket_send_string(get_actual_tcp_pose(), socket_name)
+
+        socket_send_string("trig", socket_name)
+        textmsg("trig sent")
+
+end
+easybot
