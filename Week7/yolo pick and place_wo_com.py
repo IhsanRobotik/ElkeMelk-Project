@@ -10,7 +10,7 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 model
-model = YOLO('elkemelk.pt')   # Replace 'ah.pt' with your trained model
+model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt')  # Replace 'ah.pt' with your trained model
 
 # Set the model to use the GPU
 model.to(device)
@@ -49,7 +49,7 @@ def main():
                     [0, 892.40326491, 360.40764759],
                     [0, 0, 1]])
     dist = np.array([0.20148339, -0.99826633, 0.00147814, 0.00218007, 1.33627184])
-    known_width_mm = 329
+    known_width_mm = 341
     known_pixel_width = 1280
 
     # Calculate conversion factor from pixels to mm
@@ -131,7 +131,7 @@ def main():
             pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
-            print(f"robot coords:{pickupX},{pickupY}")
+            print(f"camera:{realX},{realY}")
 
         # Display the result for the detected circles
         x,y,w,h = roi

@@ -30,17 +30,17 @@ s.listen(5)
 clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
-bottlecoordsX = 112.84
-bottlecoordsY = 87.78
+bottlecoordsX = 217.52070312
+bottlecoordsY = 97.77109375
 
-robotcoordsX = 133.73
-robotcoordsY = -868.25
+robotcoordsX = 72.22
+robotcoordsY = -558.44
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-firstposX = 275.18
-firstposY = -913.11
+firstposX = 216.422
+firstposY = -502.46
 
 array = [firstposX, firstposY]
 
@@ -52,7 +52,7 @@ def main():
                     [0, 892.40326491, 360.40764759],
                     [0, 0, 1]])
     dist = np.array([0.20148339, -0.99826633, 0.00147814, 0.00218007, 1.33627184])
-    known_width_mm = 329
+    known_width_mm = 341
     known_pixel_width = 1280
 
     # Calculate conversion factor from pixels to mm

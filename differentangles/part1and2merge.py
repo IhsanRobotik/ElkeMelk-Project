@@ -13,7 +13,7 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 model
-model = YOLO('ah.pt')   # Replace 'ah.pt' with your trained model
+model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt') 
 
 # Set the model to use the GPU
 model.to(device)
@@ -22,7 +22,7 @@ model.to(device)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the address and port
-s.bind(("192.168.0.45", 5005))
+s.bind(("192.168.0.1", 5005))
 print("listening for connection")
 # Listen for incoming connections
 s.listen(5)
@@ -34,8 +34,8 @@ print(f"Connection from {address} has been established!")
 bottlecoordsX1 = 128.13
 bottlecoordsY1 = 97.03
 
-robotcoordsX1 = 362.07
-robotcoordsY1 = 424.93
+robotcoordsX1 = 71.88
+robotcoordsY1 = -487.55
 
 offsetX1 = (robotcoordsX1) + (bottlecoordsX1)
 offsetY1 = (robotcoordsY1) - (bottlecoordsY1)

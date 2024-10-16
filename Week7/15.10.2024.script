@@ -1,13 +1,13 @@
 #textmsg(get_actual_tcp_pose())
 
 port = 5005
-ip = "192.168.0.45"
+ip = "192.168.0.1"
 socket_name = "fadil"
 
 incrementXAxis = 0
 
 socket = socket_open(ip, port, socket_name)
-firstPos=(p[0.275194, -0.913127, 0.726397, 2.27874, -2.1574, 0.0146628])
+firstPos=(p[0.216422, -0.50246, 0.477581, 2.27877, -2.15733, 0.0146874])
 movel(firstPos)
 
 set_digital_out(0,True)
@@ -72,15 +72,15 @@ while(True):
 
         x= receive[1] / 1000
         y= receive[2] / 1000
-        z= 0.39325
+        z= 0.125
 
-        movel (p[x, y, 0.50 - nextPalletZ, a[3], a[4], a[5]])
+        movel (p[x, y, 0.219 - nextPalletZ, a[3], a[4], a[5]])
         movel (p[x, y, z - nextPalletZ, a[3], a[4], a[5]])
 
         set_digital_out(0,False)
 
         # lift the bottle
-        movel (p[x, y, 0.660 - nextPalletZ, a[3], a[4], a[5]])
+        movel (p[x, y, 0.366 - nextPalletZ, a[3], a[4], a[5]])
 
         set_digital_out(0,True)
 

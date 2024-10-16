@@ -28,7 +28,7 @@ while(True):
         nextXPos=firstPos[0] + incrementXAxis
 
         movel (p[nextXPos, firstPos[1], firstPos[2] - nextPalletZ, firstPos[3], firstPos[4], firstPos[5]])
-
+ 
         socket_send_string(get_actual_tcp_pose(), socket_name)
 
         socket_send_string("trig", socket_name)

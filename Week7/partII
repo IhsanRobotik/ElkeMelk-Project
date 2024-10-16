@@ -1,0 +1,73 @@
+ 
+textmsg(get_actual_tcp_pose())
+#halt
+port = 5005
+ip = "192.168.0.1"
+socket_name = "fadil"
+
+incrementXAxis = 0
+
+socket = socket_open(ip, port, socket_name)
+firstPos=(p[0.216422, -0.50246, 0.477581, 2.27877, -2.15733, 0.0146874])
+movel(firstPos)
+
+sleep(0.1)
+set_digital_out(0,True)
+socket_send_string("trig", socket_name)
+
+while(True):
+
+receive = socket_read_ascii_float(2, socket_name)
+
+if receive[1] == 69:
+
+textmsg("IM GOING TO NEXT ROW")
+incrementXAxis=incrementXAxis + 0.06587
+nextXPos=firstPos[0] + incrementXAxis
+
+movel (p[nextXPos, firstPos[1], firstPos[2], firstPos[3], firstPos[4], firstPos[5]])
+sleep(0.5)
+
+socket_send_string(get_actual_tcp_pose(), socket_name)
+sleep(0.1)
+
+socket_send_string("trig", socket_name)
+receive = socket_read_ascii_float(2, socket_name)
+
+sleep(0.01)
+end
+
+
+textmsg(receive)
+sleep(0.01)
+
+a=get_actual_tcp_pose()
+
+x= receive[1] / 1000
+y= receive[2] / 1000
+z= 0.125
+
+movel (p[x, y, 0.219, a[3], a[4], a[5]])
+movel (p[x, y, z, a[3], a[4], a[5]])
+
+sleep(0.1)
+
+set_digital_out(0,False)
+
+movel (p[x, y, 0.366, a[3], a[4], a[5]])
+sleep(0.1)
+set_digital_out(0,True)
+
+movel (p[x+0.140, y+0.075, a[2], a[3], a[4], a[5]], 0.3, 0.5)
+sleep(0.1)
+
+socket_send_string(get_actual_tcp_pose(), socket_name)
+
+sleep(0.1)
+
+socket_send_string("trig", socket_name)
+textmsg("trig send")
+
+
+end
+ 
