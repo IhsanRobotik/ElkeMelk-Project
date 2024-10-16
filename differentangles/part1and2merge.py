@@ -60,7 +60,7 @@ offsetY = (robotcoordsY) + (bottlecoordsX)
 firstposX = 275.18
 firstposY = -913.11
 
-array = [firstposX, firstposY]
+
 
 counter = 0
 
@@ -95,17 +95,19 @@ def main():
         print(msg)
 
         if "trig" in msg:
+            counterb = 0
             if array1[0] > 595:                                      #certain x border
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < -788:                                   #certain y border
+            elif array1[1] < 105:         #788                          #certain y border
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
+                cap.release()
+                cv.destroyAllWindows()
                 break
             else:
-                while True:
-                    counterb = 0	
+                while True:	
                     ret, frame = cap.read()
 
                     if not ret:
@@ -189,9 +191,11 @@ def main():
                         break
                     else:
                         counterb = counterb + 1
+                        print(f"{counterb}")
                         if counterb > 4:
-                            print("no bottles")
-                            break  
+                            print("Going to next row because no bottles")
+                            clientsocket.send(bytes("(69)", "ascii"))
+                            break
                 
         elif "p" in msg:
             cleaned_msg = msg.replace("p", "")
@@ -204,8 +208,28 @@ def main():
         else: 
             break
 
+        # Display the result for the detected circles
+        x,y,w,h = roi
+        annotated1_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
+        cv.imshow("Detected Circle 1", annotated1_frame) #show the cropped imgge
+
+        if cv.waitKey(1) == ord('w'):
+            break
+
+    cap.release()
+    cv.destroyAllWindows()
+
+    # Initialize the video capture object
+    cap = cv.VideoCapture(camera)  # Change to 0 for the default camera
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
     
-    
+    if not cap.isOpened():
+        return -1
+    roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
+
+    array = [firstposX, firstposY]
+
     while True:
         msg = clientsocket.recv(1024)
         
@@ -316,10 +340,11 @@ def main():
         else: 
             break 
 
-        # # Display the result for the detected circles
-        # x,y,w,h = roi
-        # annotated_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
-        # cv.imshow("Detected Circle 1", annotated_frame) #show the cropped imgge
+        # Display the result for the detected circles
+        x,y,w,h = roi
+        annotated_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
+        cv.imshow("Detected Circle 1", annotated_frame) #show the cropped imgge
+
 
         if cv.waitKey(1) == ord('q'):
             break

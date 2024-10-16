@@ -127,7 +127,7 @@ def main():
         # Output the leftmost object's center
         if leftmost_center:
             print(f"Leftmost object center: {leftmost_center}")
-            time.sleep(1)
+            # time.sleep(1)
 
             # print(f"Leftmost detected object center: {leftmost_center}")
             realX = leftmost_center[0] * conversion_factor

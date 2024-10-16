@@ -63,11 +63,6 @@ while (True):
   movel (p[x, y, 0.660, b[3], b[4], b[5]])
   sleep(0.1)
   set_digital_out(0,True)
-  
-  if receive[1] == 25:
-    break
-  #sleep(0.01)
-  #end
 
 end
 
