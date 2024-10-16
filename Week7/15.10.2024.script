@@ -10,9 +10,13 @@ socket = socket_open(ip, port, socket_name)
 firstPos=(p[0.275194, -0.913127, 0.726397, 2.27874, -2.1574, 0.0146628])
 movel(firstPos)
 
-sleep(0.1)
 set_digital_out(0,True)
 socket_send_string("trig", socket_name)
+
+rowCounter = 0
+
+mcc = p[firstPos[0] + 0.5, firstPos[1] + 0.6, firstPos[2], firstPos[3], firstPos[4], firstPos[5]]
+nextPalletZ = 0
 
 while(True):
 
@@ -23,30 +27,43 @@ while(True):
         incrementXAxis=incrementXAxis + 0.06587
         nextXPos=firstPos[0] + incrementXAxis
 
-        movel (p[nextXPos, firstPos[1], firstPos[2], firstPos[3], firstPos[4], firstPos[5]])
+        movel (p[nextXPos, firstPos[1], firstPos[2] - nextPalletZ, firstPos[3], firstPos[4], firstPos[5]])
 
         socket_send_string(get_actual_tcp_pose(), socket_name)
 
         socket_send_string("trig", socket_name)
         receive = socket_read_ascii_float(2, socket_name)
 
-    elif receive[1] == 2000:
-        textmsg("grab the carton")
-        # go to midle of carton
-        # movel(p[  ])
-        # set_digital_out(1,True)
-    
-        # # move carton upwards
-        # movel(p[   ])
+        rowCounter = rowCounter + 1
+        if rowCounter == 2:
+          liftPallet= mcc
+          mcc[2] = mcc[2] - nextPalletZ
+          movel(mcc)
+          liftPallet[2] = liftPallet - mcc[2] - nextPalletZ
+          movel(liftPallet)
 
-        # # move carton to the side?
-        # # movel and movej?
-    
-        # set_digital_out(1, False)
-    
-        # # go back to original pos and descent z axis by (bottle + carboard height) 
-        # firstPos[2] = firstPos[2] - 0.245
-        # movel(firstPos)
+          # go downward?
+          
+          set_digital_out(1,True)
+      
+          # move carton upwards
+          # movel()
+
+          # move carton to the side?
+      
+          set_digital_out(1, False)
+      
+          # go back to original pos and descent z axis by (bottle + carboard height)
+          # to get next layer coordinate
+
+          # newFirstPosZ = newFirstPosZ - 0.245
+
+          # newFirstPos = p[firstPos[0], firstPos[1], newFirstPosZ, firstPos[3], firstPos[4], firstPos[5]]
+
+          # movel(firstPos)
+
+          nextPalletZ = nextPalletZ + 0.241
+        end
 
     else:
         textmsg(receive)
@@ -57,21 +74,21 @@ while(True):
         y= receive[2] / 1000
         z= 0.39325
 
-        movel (p[x, y, 0.50, a[3], a[4], a[5]])
-        movel (p[x, y, z, a[3], a[4], a[5]])
+        movel (p[x, y, 0.50 - nextPalletZ, a[3], a[4], a[5]])
+        movel (p[x, y, z - nextPalletZ, a[3], a[4], a[5]])
 
         set_digital_out(0,False)
 
-        movel (p[x, y, 0.660, a[3], a[4], a[5]])
-        sleep(0.1)
+        # lift the bottle
+        movel (p[x, y, 0.660 - nextPalletZ, a[3], a[4], a[5]])
+
         set_digital_out(0,True)
 
-        movel (p[x+0.140, y+0.075, a[2], a[3], a[4], a[5]], 0.3, 0.5)
+        movel (p[x+0.140, y+0.075, a[2] - nextPalletZ, a[3], a[4], a[5]])
 
         socket_send_string(get_actual_tcp_pose(), socket_name)
 
         socket_send_string("trig", socket_name)
         textmsg("trig sent")
-
+    end
 end
-easybot
