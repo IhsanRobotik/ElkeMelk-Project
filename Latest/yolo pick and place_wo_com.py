@@ -30,17 +30,17 @@ model.to(device)
 # clientsocket, address = s.accept()
 # print(f"Connection from {address} has been established!")
 
-bottlecoordsX = 152.16
-bottlecoordsY = 94.07
+bottlecoordsX = 136.22
+bottlecoordsY = 95.35
 
-robotcoordsX = 133.90
-robotcoordsY = -908.72
+robotcoordsX = 63.11
+robotcoordsY = -480.42
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-firstposX = 275.18
-firstposY = -913.11
+firstposX = 216.42
+firstposY = -502.46
 
 array = [firstposX, firstposY]
 
@@ -52,7 +52,7 @@ def main():
                     [0, 892.40326491, 360.40764759],
                     [0, 0, 1]])
     dist = np.array([0.20148339, -0.99826633, 0.00147814, 0.00218007, 1.33627184])
-    known_width_mm = 329
+    known_width_mm = 345
     known_pixel_width = 1280
 
     # Calculate conversion factor from pixels to mm
@@ -64,7 +64,7 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
     if not cap.isOpened():
         return -1
-    roi_x, roi_y, roi_w, roi_h = 400, 0, 210, 720  # Define the ROI coordinates
+    roi_x, roi_y, roi_w, roi_h = 0, 260, 1280, 200  # Define the ROI coordinates
 
     while True:
         # Capture frame-by-frame
@@ -111,8 +111,8 @@ def main():
                     continue  # Skip this box if something is wrong
                 
                 # Calculate the center point
-                center_x = (x1 + x2) / 2 + 400
-                center_y = (y1 + y2) / 2  # Adjust y-coordinate as needed
+                center_x = (x1 + x2) / 2
+                center_y = (y1 + y2) / 2 + 260  # Adjust y-coordinate as needed
                 cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
                 # Debugging: Print each box's coordinates and its center
@@ -138,7 +138,7 @@ def main():
 
             pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
-
+            print(f"mm coords:{realX},{realY}")
             # print(f"mm coords:{realX},{realY}")
             
             # print(f"robot coords:{pickupX},{pickupY}")

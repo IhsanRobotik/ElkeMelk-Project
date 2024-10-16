@@ -13,7 +13,7 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 model
-model = YOLO('ah.pt')   # Replace 'ah.pt' with your trained model
+model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/models/rimV2.pt")   # Replace 'ah.pt' with your trained model
 
 # Set the model to use the GPU
 model.to(device)
@@ -124,7 +124,7 @@ def main():
                     roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
 
                     # Run YOLOv8 inference on the cropped ROI
-                    results = model(roi_frame, verbose=False, conf=0.85)
+                    results = model(roi_frame, verbose=False, conf=0.75)
 
                     # Convert YOLOv8 results back into an OpenCV-friendly format for display
                     annotated_roi_frame = results[0].plot()
@@ -256,7 +256,7 @@ def main():
                 roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
 
                 # Run YOLOv8 inference on the cropped ROI
-                results = model(roi_frame, verbose=False, conf=0.85)
+                results = model(roi_frame, verbose=False, conf=0.75)
 
                 # Convert YOLOv8 results back into an OpenCV-friendly format for display
                 annotated_roi_frame = results[0].plot()
