@@ -13,7 +13,7 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 model
-model = YOLO('ihsansV5.pt')   # Replace 'ah.pt' with your trained model
+model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt') 
 
 # Set the model to use the GPU
 model.to(device)
