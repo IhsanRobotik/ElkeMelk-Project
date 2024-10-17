@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 0
+camera = 1
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -138,8 +138,9 @@ def main():
 
             pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
+            
             print(f"mm coords:{realX},{realY}")
-            # print(f"mm coords:{realX},{realY}")
+            # print(f"mm coords:{deltaX},{deltaY}")
             
             # print(f"robot coords:{pickupX},{pickupY}")
         #     msg = clientsocket.recv(1024)

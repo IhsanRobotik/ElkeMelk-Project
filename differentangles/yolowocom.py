@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 0
+camera = 1
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -13,11 +13,8 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 model
-<<<<<<< HEAD
-model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt')    # Replace 'ah.pt' with your trained model
-=======
 model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/models/rimV2.pt")   # Replace 'ah.pt' with your trained model
->>>>>>> fd7d9973740cfd75c2c65a7b477b1b324aafc26b
+
 
 # Set the model to use the GPU
 model.to(device)

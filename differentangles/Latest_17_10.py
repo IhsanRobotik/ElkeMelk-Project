@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 0
+camera = 1
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -15,7 +15,6 @@ if torch.cuda.is_available():
 # Load the pre-trained YOLOv8 model
 model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/models/rimV2.pt")   # Replace 'ah.pt' with your trained model
 
-
 # Set the model to use the GPU
 model.to(device)
 
@@ -23,7 +22,7 @@ model.to(device)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
+s.bind(("192.168.0.45", 5005))
 print("listening for connection")
 # Listen for incoming connections
 s.listen(5)
@@ -32,36 +31,36 @@ clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
 # Part I variables
-bottlecoordsX1 = 128.13
-bottlecoordsY1 = 97.03
+bottlecoordsX1 = 134.80156250000002
+bottlecoordsY1 = 104.43125
 
-robotcoordsX1 = 71.88
-robotcoordsY1 = -487.55
+robotcoordsX1 = 313.94
+robotcoordsY1 = 759.98
 
 offsetX1 = (robotcoordsX1) + (bottlecoordsX1)
 offsetY1 = (robotcoordsY1) - (bottlecoordsY1)
 
 # First position of the robot
-firstposX1 = 326.06
-firstposY1 = 288.15
+firstposX1 = 277.07
+firstposY1 = 607.10
 
 array1 = [firstposX1, firstposY1]
 
-# Part II variables
-bottlecoordsX = 112.84
-bottlecoordsY = 87.78
 
-robotcoordsX = 133.73
-robotcoordsY = -868.25
+# Part II variables
+bottlecoordsX = 213.46875                           #Bottle coordinates X via cameraview
+bottlecoordsY = 90.83203125                         #Bottle coordinates Y via cameraview
+
+robotcoordsX = 345.52                                #Robot coordinates X, real world
+robotcoordsY = -553.71                               #Robot coordinates Y, real world
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-# First position of the robot
-firstposX = 275.18
-firstposY = -913.11
+firstposX = 486.42                                   #First position of the robot
+firstposY = -502.44                                  #First position of the robot
 
-
+array = [firstposX, firstposY]
 
 counter = 0
 
@@ -71,7 +70,7 @@ def main():
                     [0, 892.40326491, 360.40764759],
                     [0, 0, 1]])
     dist = np.array([0.20148339, -0.99826633, 0.00147814, 0.00218007, 1.33627184])
-    known_width_mm = 329
+    known_width_mm = 341
     known_pixel_width = 1280
 
     # Calculate conversion factor from pixels to mm
@@ -97,11 +96,11 @@ def main():
 
         if "trig" in msg:
             counterb = 0
-            if array1[0] > 595:                                      #certain x border
+            if array1[0] > 517:                                      #certain x border
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 105:         #788                          #certain y border
+            elif array1[1] < -622:                                   #certain y border
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -193,7 +192,7 @@ def main():
                     else:
                         counterb = counterb + 1
                         print(f"{counterb}")
-                        if counterb > 4:
+                        if counterb > 8:
                             print("Going to next row because no bottles")
                             clientsocket.send(bytes("(69)", "ascii"))
                             break
@@ -228,8 +227,6 @@ def main():
     if not cap.isOpened():
         return -1
     roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
-
-    array = [firstposX, firstposY]
 
     while True:
         msg = clientsocket.recv(1024)
@@ -307,12 +304,14 @@ def main():
                     realY = leftmost_center[1] * conversion_factor
 
                     deltaY = (-1) * realX
-                    deltaX = (-1) * realY #i might make a mistake here
+                    deltaX = (-1) * realY       #I might made a mistake here
 
-                    pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
-                    pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
+                    pickupX = deltaX + offsetX + ((firstposX - (array[0])) * (-1))
+                    pickupY = deltaY + offsetY + ((firstposY - (array[1])) * (-1))
 
-                    print(f"robot coords:{pickupX},{pickupY}")
+                    # print(f"robot coords:{pickupX},{pickupY}")
+                    print(f"deltaX: {deltaX}")
+                    print(f"deltaY: {deltaY}")
 
                     formatted_string = "({0}, {1})".format(pickupX, pickupY)
                     message_to_send = formatted_string  # Coordinates to send

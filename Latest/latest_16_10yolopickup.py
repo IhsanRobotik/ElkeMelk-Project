@@ -143,7 +143,7 @@ def main():
                     realY = leftmost_center[1] * conversion_factor
 
                     deltaY = (-1) * realX
-                    deltaX = (-1) * realY #i might make a mistake here
+                    deltaX = (-1) * realY       #I might made a mistake here
 
                     pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
                     pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
