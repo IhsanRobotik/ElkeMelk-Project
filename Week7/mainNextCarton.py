@@ -17,6 +17,7 @@ model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt'
 
 # Set the model to use the GPU
 model.to(device)
+model.classes = [2]
 
 # Create a socket object
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
