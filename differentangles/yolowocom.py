@@ -56,7 +56,7 @@ def main():
                     [0, 892.40326491, 360.40764759],
                     [0, 0, 1]])
     dist = np.array([0.20148339, -0.99826633, 0.00147814, 0.00218007, 1.33627184])
-    known_width_mm = 329
+    known_width_mm = 341
     known_pixel_width = 1280
 
     # Calculate conversion factor from pixels to mm
@@ -143,7 +143,7 @@ def main():
             pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
-            # print(f"mm coords:{realX},{realY}")
+            print(f"mm coords:{realX},{realY}")
             
             # print(f"robot coords:{pickupX},{pickupY}")
         #     msg = clientsocket.recv(1024)
