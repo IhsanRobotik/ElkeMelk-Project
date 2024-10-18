@@ -99,7 +99,7 @@ def main():
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 588:                                   #certain y border   #-484 correct position
+            elif array1[1] < -484:                                   #certain y border   #-484 correct position
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -138,9 +138,6 @@ def main():
                     # Initialize variables to track the leftmost object
                     leftmost_x = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
                     leftmost_center = None
-
-                    print("Camera started message")
-                    clientsocket.send(bytes("(44)", "ascii"))
 
                     # Iterate over the results and find the leftmost detected object
                     if results and results[0].boxes:

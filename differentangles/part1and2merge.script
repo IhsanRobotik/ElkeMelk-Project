@@ -19,7 +19,7 @@ socket_send_string("trig", socket_name)
 
 while (True):
   
-  receive = socket_read_ascii_float(2, socket_name)  
+  receive = socket_read_ascii_float(2, socket_name, 0)  
   
   if receive[1] == 69:
 
@@ -37,6 +37,7 @@ while (True):
     receive = socket_read_ascii_float(2, socket_name)
     
     sleep(0.01)
+    continue
     end
   
   if receive[1] == 25:
