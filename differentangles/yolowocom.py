@@ -65,7 +65,7 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
     if not cap.isOpened():
         return -1
-    roi_x, roi_y, roi_w, roi_h = 400, 0, 210, 720  # Define the ROI coordinates
+    roi_x, roi_y, roi_w, roi_h = 515, 0, 250, 720  # Define the ROI coordinates
 
     while True:
         # Capture frame-by-frame
@@ -112,7 +112,7 @@ def main():
                     continue  # Skip this box if something is wrong
                 
                 # Calculate the center point
-                center_x = (x1 + x2) / 2 + 400
+                center_x = (x1 + x2) / 2 + 510
                 center_y = (y1 + y2) / 2  # Adjust y-coordinate as needed
                 cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 

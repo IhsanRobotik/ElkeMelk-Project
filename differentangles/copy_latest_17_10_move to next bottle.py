@@ -31,32 +31,32 @@ clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
 # Part I variables
-bottlecoordsX1 = 134.401953125
-bottlecoordsY1 = 113.888671875
+bottlecoordsX1 = 165.571484375
+bottlecoordsY1 = 86.8484375
 
-robotcoordsX1 = 313.14
-robotcoordsY1 = 764.07
+robotcoordsX1 = 315.28
+robotcoordsY1 = 770.42
 
 offsetX1 = (robotcoordsX1) + (bottlecoordsX1)
 offsetY1 = (robotcoordsY1) - (bottlecoordsY1)
 
-firstposX1 = 277.07                                 #First position of the robot
-firstposY1 = 607.10                                 #First position of the robot
+firstposX1 = 312.09                                 #First position of the robot
+firstposY1 = 636.72                                 #First position of the robot
 
 array1 = [firstposX1, firstposY1]
 
 
 # Part II variables
-bottlecoordsX = 213.873046875                        #Bottle coordinates X via cameraview
-bottlecoordsY = 93.662109375                         #Bottle coordinates Y via cameraview
+bottlecoordsX = 204.03515625                        #Bottle coordinates X via cameraview
+bottlecoordsY = 95.4140625                         #Bottle coordinates Y via cameraview
 
-robotcoordsX = 343.57                                #Robot coordinates X, real world
-robotcoordsY = -553.29                               #Robot coordinates Y, real world
+robotcoordsX = 311.10                                #Robot coordinates X, real world
+robotcoordsY = -541.72                               #Robot coordinates Y, real world
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-firstposX = 480.79                                   #First position of the robot
+firstposX = 459.05                                   #First position of the robot
 firstposY = -502.44                                  #First position of the robot
 
 array = [firstposX, firstposY]
@@ -82,7 +82,7 @@ def main():
     
     if not cap.isOpened():
         return -1
-    roi_x, roi_y, roi_w, roi_h = 400, 0, 210, 720  # Define the ROI coordinates
+    roi_x, roi_y, roi_w, roi_h = 515, 0, 250, 720  # Define the ROI coordinates
 
     
     while True:
@@ -95,11 +95,11 @@ def main():
 
         if "trig" in msg:
             counterb = 0
-            if array1[0] > 517:                                      #certain x border
+            if array1[0] > 557:                                      #certain x border
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 475:                                   #certain y border
+            elif array1[1] < 588:                                   #certain y border   #-484 correct position
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -139,6 +139,9 @@ def main():
                     leftmost_x = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
                     leftmost_center = None
 
+                    print("Camera started message")
+                    clientsocket.send(bytes("(44)", "ascii"))
+
                     # Iterate over the results and find the leftmost detected object
                     if results and results[0].boxes:
                         for i, box in enumerate(results[0].boxes):
@@ -150,7 +153,7 @@ def main():
                                 continue  # Skip this box if something is wrong
                             
                             # Calculate the center point
-                            center_x = (x1 + x2) / 2 + 400
+                            center_x = (x1 + x2) / 2 + 510
                             center_y = (y1 + y2) / 2   # Adjust y-coordinate as needed
                             cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
                             
@@ -179,8 +182,8 @@ def main():
                         pickupX = -deltaX + offsetX1 + (array1[0] - firstposX1)
                         pickupY = deltaY + offsetY1 + (array1[1] - firstposY1)
                         
-                        print(f"array: {array1[0]},{array1[1]}")
-                        print(f"robot coords:{pickupX},{pickupY}")
+                        #print(f"array: {array1[0]},{array1[1]}")
+                        #print(f"robot coords:{pickupX},{pickupY}")
 
                         formatted_string = "({0}, {1})".format(pickupX, pickupY)
                         message_to_send = formatted_string  # Coordinates to send
@@ -191,12 +194,9 @@ def main():
                     else:
                         counterb = counterb + 1
                         print(f"{counterb}")
-                        if counterb > 8:
-                            print("Going to next row because no bottles")
-                            array1[1] = array1[1] + 77.08
-                            formatted_string = "({0}, {1})".format(array[0], array[1])
-                            message_to_send = formatted_string                                  # Coordinates to send
-                            clientsocket.send(bytes(message_to_send, "ascii"))
+                        if counterb > 4:
+                            print("Going to move up a little because no bottles")
+                            clientsocket.send(bytes("(55)", "ascii"))
                             break
                 
         elif "p" in msg:

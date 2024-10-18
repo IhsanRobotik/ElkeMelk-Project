@@ -186,7 +186,8 @@ def main():
                         formatted_string = "({0}, {1})".format(pickupX, pickupY)
                         message_to_send = formatted_string  # Coordinates to send
                         clientsocket.send(bytes(message_to_send, "ascii"))
-                        print("Robot Pick-Up Coordinate:", pickupX, pickupY)
+                        # print("Robot Pick-Up Coordinate:", pickupX, pickupY)
+                        print(f"{formatted_string}")
                         counterb = 0
                         break
                     else:
