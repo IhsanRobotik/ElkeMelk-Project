@@ -11,7 +11,9 @@ if torch.cuda.is_available():
 
 # Load the pre-trained YOLOv8 model
 model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\obbV5.pt')  # Replace 'ah.pt' with your trained model
-print(model.names)
+
+TARGET_CLASS_NAME = 'bottle_open'
+
 # Set the model to use the GPU
 model.to(device)
 
@@ -83,17 +85,15 @@ def main():
         # Run YOLOv8 inference on the cropped ROI
         results = model(roi_frame, verbose=False, conf=0.85)
 
-        for result in results:
-            boxes = result.boxes  # Boxes object for bounding box outputs
-            masks = result.masks  # Masks object for segmentation masks outputs
-            keypoints = result.keypoints  # Keypoints object for pose outputs
-            probs = result.probs  # Probs object for classification outputs
-            detected_class = result.obb  # The class ID (tensor)
+        # for result in results:
+        #     boxes = result.boxes  # Boxes object for bounding box outputs
+        #     masks = result.masks  # Masks object for segmentation masks outputs
+        #     keypoints = result.keypoints  # Keypoints object for pose outputs
+        #     probs = result.probs  # Probs object for classification outputs
+        #     obb = result.obb  # Oriented boxes object for OBB outputs
+        #     name = obb.cls
+        #     print(name)
 
-            class_id = detected_class.cls  # Convert to int
-            # Print the class ID
-            print("Detected Class ID:", class_id)
-            
         # Convert YOLOv8 results back into an OpenCV-friendly format for display
         annotated_roi_frame = results[0].plot()
 
@@ -110,12 +110,24 @@ def main():
 
         # Iterate over the results and find the leftmost detected object
         if results and results[0].boxes:
+            
             for i, box in enumerate(results[0].boxes):
-                # Get bounding box coordinates
+                # Get bounding box coordinates for OBB
                 try:
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])  # Extracting coordinates and converting to integers
+                    print(box.cls)  # Class of the detected object
+                    
+                    # Assuming the OBB model returns four corner points
+                    corners = box.xyxy  # Or replace 'xyxy' with the correct attribute for corners in your model
+                    # Extract and convert the corner coordinates to integers
+                    x1, y1, x2, y2, x3, y3, x4, y4 = map(int, corners[0])
+                    
+                    # If the model uses (cx, cy, w, h, θ), extract and process accordingly:
+                    # cx, cy, w, h, theta = box.cxcywhtheta[0]
+                    
+                    # You can further process or visualize the OBB as needed
                 except Exception as e:
                     continue  # Skip this box if something is wrong
+
                 
                 # Calculate the center point
                 center_x = (x1 + x2) / 2

@@ -44,7 +44,7 @@ while(True):
 
         rowCounter = rowCounter + 1
 
-        if rowCounter == 15:
+        if rowCounter == 2:
           liftPallet= mcc
           mcc[2] = mcc[2] - nextPalletZ
           movel(mcc)
@@ -103,30 +103,8 @@ while(True):
         #pick from the front
         else:
           textmsg("picking from side")
-          textmsg(receive)
 
-          a=get_actual_tcp_pose()
-  
-          x= receive[1] / 1000
-          y= receive[2] / 1000
-          z= 0.125
-  
-          movel (p[x, y, 0.219 - nextPalletZ, a[3], a[4], a[5]])
-          movel (p[x, y, z - nextPalletZ, a[3], a[4], a[5]])
-  
-          set_digital_out(0,False)
-  
-          # lift the bottle
-          movel (p[x, y, 0.366 - nextPalletZ, a[3], a[4], a[5]])
-  
-          set_digital_out(0,True)
-  
-          movel (p[x+0.140, y+0.075, a[2] - nextPalletZ, a[3], a[4], a[5]])
-  
-          socket_send_string(get_actual_tcp_pose(), socket_name)
-  
-          socket_send_string("trig", socket_name)
-          textmsg("trig sent")
+
  
         end
     end
