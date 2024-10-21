@@ -31,17 +31,17 @@ clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
 # Part I variables
-bottlecoordsX1 = 165.571484375
-bottlecoordsY1 = 86.8484375
+bottlecoordsX1 = 171.565625
+bottlecoordsY1 = 114.021875
 
-robotcoordsX1 = 315.28
-robotcoordsY1 = 770.42
+robotcoordsX1 = 320.00
+robotcoordsY1 = 770.29
 
 offsetX1 = (robotcoordsX1) + (bottlecoordsX1)
 offsetY1 = (robotcoordsY1) - (bottlecoordsY1)
 
-firstposX1 = 312.09                                 #First position of the robot
-firstposY1 = 636.72                                 #First position of the robot
+firstposX1 = 317.68                                 #First position of the robot
+firstposY1 = 607.10                                 #First position of the robot
 
 array1 = [firstposX1, firstposY1]
 
