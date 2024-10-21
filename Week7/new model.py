@@ -4,7 +4,7 @@ import torch
 from ultralytics import YOLO
 import socket
 import ast
-camera = 1
+camera = 0
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -21,7 +21,7 @@ model.to(device)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
+s.bind(("192.168.74.1", 5005))
 print("listening for connection")
 # Listen for incoming connections
 s.listen(5)
@@ -74,6 +74,7 @@ def main():
             break
         msg = (msg.decode("utf-8"))
         print(msg)
+        msg = "trig"
 
         if "trig" in msg:
             while True:
@@ -110,19 +111,30 @@ def main():
                 leftmost_center = None
 
                 # Iterate over the results and find the leftmost detected object
-                if results and results[0].boxes:
-                    for i, box in enumerate(results[0].boxes):
-                        # Get bounding box coordinates
-                        try:
-                            x1, y1, x2, y2 = map(int, box.xyxy[0])  # Extracting coordinates and converting to integers
-                        except Exception as e:
-                            # print(f"Error processing bounding box {i}: {e}")
-                            continue  # Skip this box if something is wrong
-                        
-                        # Calculate the center point
-                        center_x = (x1 + x2) / 2
-                        center_y = (y1 + y2) / 2 + 240  # Adjust y-coordinate as needed
-                        cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
+                if results and results[0].obb:
+                    for i, obb in enumerate(results[0].obb):
+                        # Get the class label
+                        label = results[0].names[int(obb.cls[0])]
+
+                        # Process only the 'bottle_open' class
+                        if label == 'bottle_open':
+                            # Get the OBB coordinates
+                            vertices = obb.xyxyxyxy[0].cpu().numpy()  # Retrieve the vertices (4 points)
+
+                            # Calculate the center point of the OBB
+                            center_x = np.mean(vertices[:, 0])  # Average x-coordinates
+                            center_y = np.mean(vertices[:, 1])  # Average y-coordinates
+
+                            # Draw the OBB using the vertices
+                            points = vertices.astype(int)
+                            for j in range(len(points)):
+                                cv.line(frame, tuple(points[j]), tuple(points[(j + 1) % len(points)]), (0, 255, 0), 2)
+
+                            # Draw a circle at the center point
+                            cv.circle(frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
+
+                            # Print debug information
+                            print(f"OBB {i}: Vertices = {vertices}, Center = ({center_x}, {center_y})")
 
                         # Debugging: Print each box's coordinates and its center
                         # print(f"Object {i}: Bounding Box = ({x1}, {y1}, {x2}, {y2}), Center = ({center_x}, {center_y})")

@@ -17,17 +17,17 @@ model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt'
 # Set the model to use the GPU
 model.to(device)
 
-# Create a socket object
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# # Create a socket object
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
-print("listening for connection")
-# Listen for incoming connections
-s.listen(5)
-# Accept a connection from a client
-clientsocket, address = s.accept()
-print(f"Connection from {address} has been established!")
+# # Bind the socket to the address and port
+# s.bind(("192.168.0.1", 5005))
+# print("listening for connection")
+# # Listen for incoming connections
+# s.listen(5)
+# # Accept a connection from a client
+# clientsocket, address = s.accept()
+# print(f"Connection from {address} has been established!")
 
 bottlecoordsX = 217.52070312
 bottlecoordsY = 97.77109375
@@ -68,14 +68,14 @@ def main():
     roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
 
     while True:
-        msg = clientsocket.recv(1024)
+        # msg = clientsocket.recv(1024)
         
-        if not msg:  # If no message is received, break the loop
-            break
-        msg = (msg.decode("utf-8"))
-        print(msg)
+        # if not msg:  # If no message is received, break the loop
+        #     break
+        # msg = (msg.decode("utf-8"))
+        # print(msg)
 
-        if "trig" in msg:
+        # if "trig" in msg:
             while True:
                 ret, frame = cap.read()
 
@@ -155,35 +155,35 @@ def main():
 
                     print(f"robot coords:{pickupX},{pickupY}")
 
-                    formatted_string = "({0}, {1})".format(pickupX, pickupY)
-                    message_to_send = formatted_string  # Coordinates to send
-                    clientsocket.send(bytes(message_to_send, "ascii"))
-                    print("Robot Pick-Up Coordinate:", pickupX, pickupY)
+        #             formatted_string = "({0}, {1})".format(pickupX, pickupY)
+        #             message_to_send = formatted_string  # Coordinates to send
+        #             clientsocket.send(bytes(message_to_send, "ascii"))
+        #             print("Robot Pick-Up Coordinate:", pickupX, pickupY)
                     
-                    global counter 
-                    counter = 0   
+        #             global counter 
+        #             counter = 0   
 
-                else:
-                    counter = counter + 1
-                    print(f"counter: {counter}")
-                    if counter > 4:
-                        print("send 69")
-                        clientsocket.send(bytes("(69)", "ascii"))
-                        break
+        #         else:
+        #             counter = counter + 1
+        #             print(f"counter: {counter}")
+        #             if counter > 4:
+        #                 print("send 69")
+        #                 clientsocket.send(bytes("(69)", "ascii"))
+        #                 break
                           
-        elif "p" in msg:
-            cleaned_msg = msg.replace("p", "")
-            cleaned_msg = cleaned_msg.replace("trig", "")
-            print("this is cleaned msg", cleaned_msg)
-            array = ast.literal_eval(cleaned_msg)
-            array[0] = array[0] * 1000
-            array[1] = array[1] * 1000
+        # elif "p" in msg:
+        #     cleaned_msg = msg.replace("p", "")
+        #     cleaned_msg = cleaned_msg.replace("trig", "")
+        #     print("this is cleaned msg", cleaned_msg)
+        #     array = ast.literal_eval(cleaned_msg)
+        #     array[0] = array[0] * 1000
+        #     array[1] = array[1] * 1000
 
-        else: 
-            break 
-
-        if cv.waitKey(1) == ord('q'):
-            break
+        # else: 
+        #     break 
+            cv.imshow("Detected Circle 1", annotated_frame)
+            if cv.waitKey(1) == ord('q'):
+                break
 
     cap.release()
     cv.destroyAllWindows()
