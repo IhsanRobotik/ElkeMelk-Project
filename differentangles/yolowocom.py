@@ -13,7 +13,7 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 model
-model = YOLO(r'C:\Users\Ihsan\Documents\GitHub\ElkeMelk-Project\models\rimV2.pt')    # Replace 'ah.pt' with your trained model
+model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/models/rimV2.pt")    # Replace 'ah.pt' with your trained model
 
 
 # Set the model to use the GPU
@@ -65,11 +65,8 @@ def main():
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
     if not cap.isOpened():
         return -1
-<<<<<<< HEAD
-    roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
-=======
+
     roi_x, roi_y, roi_w, roi_h = 515, 0, 250, 720  # Define the ROI coordinates
->>>>>>> 7b359dc70313f752bde519e130d3d2fe5265d778
 
     while True:
         # Capture frame-by-frame
@@ -116,13 +113,9 @@ def main():
                     continue  # Skip this box if something is wrong
                 
                 # Calculate the center point
-<<<<<<< HEAD
-                center_x = (x1 + x2) / 2
-                center_y = (y1 + y2) / 2 + 240  # Adjust y-coordinate as needed
-=======
                 center_x = (x1 + x2) / 2 + 510
                 center_y = (y1 + y2) / 2  # Adjust y-coordinate as needed
->>>>>>> 7b359dc70313f752bde519e130d3d2fe5265d778
+
                 cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
                 # Debugging: Print each box's coordinates and its center

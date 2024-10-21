@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 0
+camera = 1
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -13,20 +13,20 @@ if torch.cuda.is_available():
     print("CUDA is available and enabled.")
 
 # Load the pre-trained YOLOv8 OBB model
-model = YOLO(r"C:/Users/gabri/Downloads/obbV5.pt")  # Update with your OBB model path
+model = YOLO(r"C:/Users/basti/Documents/GitHub/ElkeMelk-Project/models/obbV5.pt")  # Update with your OBB model path
 
-# Define coordinates
-bottlecoordsX = 152.16
-bottlecoordsY = 94.07
+# Part II variables
+bottlecoordsX = 149.59208498001098                       #Bottle coordinates X via cameraview
+bottlecoordsY = 90.73866143226624                         #Bottle coordinates Y via cameraview
 
-robotcoordsX = 133.90
-robotcoordsY = -908.72
+robotcoordsX = 335.18                              #Robot coordinates X, real world
+robotcoordsY = -489.44                              #Robot coordinates Y, real world
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
 
-firstposX = 275.18
-firstposY = -913.11
+firstposX = 485.64                                   #First position of the robot
+firstposY = -502.46                                  #First position of the robot
 
 array = [firstposX, firstposY]
 
@@ -54,9 +54,10 @@ def main():
         return -1
 
     # Define the ROI coordinates (adjust as necessary)
-    roi_x, roi_y, roi_w, roi_h = 0, 260, 1280, 200  # Green border ROI dimensions
+    roi_x, roi_y, roi_w, roi_h = 0, 235, 1280, 250  # Green border ROI dimensions
 
     while True:
+        time.sleep(1)
         # Capture frame-by-frame
         ret, frame = cap.read()
 
@@ -144,6 +145,7 @@ def main():
             pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
 
             print(f"mm coords: {realX}, {realY}")
+            print(f"robot coords: {pickupX}, {pickupY}")
         else:
             # print("No 'bottle_open' object detected in the current frame.")
             print(f"Detected classes: {detected_classes}")  # Print all detected classes

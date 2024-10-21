@@ -22,7 +22,7 @@ model.to(device)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Bind the socket to the address and port
-s.bind(("192.168.0.1", 5005))
+s.bind(("192.168.0.45", 5005))
 print("listening for connection")
 # Listen for incoming connections
 s.listen(5)
@@ -30,11 +30,11 @@ s.listen(5)
 clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
-bottlecoordsX = 112.84
-bottlecoordsY = 87.78
+bottlecoordsX = 119.64
+bottlecoordsY = 91.76
 
-robotcoordsX = 133.73
-robotcoordsY = -868.25
+robotcoordsX = 128.88
+robotcoordsY = -875.30
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
@@ -133,11 +133,6 @@ def main():
                             leftmost_x = center_x
                             leftmost_center = (center_x, center_y)
 
-                            # Display the result for the detected circles
-                            x,y,w,h = roi
-                            annotated_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
-                            cv.imshow("Detected Circle 1", annotated_frame) #show the cropped imgge
-
                 # Output the leftmost object's center
                 if leftmost_center:
                     print(f"Leftmost object center: {leftmost_center}")
@@ -181,6 +176,11 @@ def main():
 
         else: 
             break 
+
+        # Display the result for the detected circles
+        x,y,w,h = roi
+        annotated_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
+        cv.imshow("Detected Circle 1", annotated_frame) #show the cropped imgge
 
         if cv.waitKey(1) == ord('q'):
             break

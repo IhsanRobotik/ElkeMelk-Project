@@ -52,7 +52,7 @@ def main():
                     [0, 892.40326491, 360.40764759],
                     [0, 0, 1]])
     dist = np.array([0.20148339, -0.99826633, 0.00147814, 0.00218007, 1.33627184])
-    known_width_mm = 345
+    known_width_mm = 341
     known_pixel_width = 1280
 
     # Calculate conversion factor from pixels to mm
