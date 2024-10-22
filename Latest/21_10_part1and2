@@ -1,0 +1,233 @@
+#firstPos=(p[0.485645, -0.502465, 0.477633, 2.27877, -2.15725, 0.014982])
+#movel(firstPos)
+#halt
+#textmsg(get_actual_tcp_pose())
+#halt
+port = 5005
+ip = "192.168.0.45"
+socket_name = "fadil"
+
+incrementXAxis = 0
+incrementYAxis = 0
+
+incrementYAxispartII = 0.1705
+incrementXAxispartI = 0.06638
+
+socket = socket_open(ip, port, socket_name)
+
+# Part I
+beforepos=(p[0.543193, -0.136281, 0.605497, 2.26049, -2.17664, 0.0147137])
+movel(beforepos)
+
+
+firstPos1= (p[0.317688, 0.607102, 0.477562, -0.0857986, 3.13629, -0.0143348])
+movel(firstPos1)
+
+sleep(0.1)
+set_digital_out(0,True)
+sleep(4)
+socket_send_string("trig", socket_name)
+textmsg("trig send1")
+
+
+while (True):
+textmsg("receiving")
+receive = socket_read_ascii_float(2, socket_name)  
+
+  if receive[1] == 69:
+
+    textmsg("IM GOING TO NEXT ROW")
+    incrementYAxis = incrementYAxis - 0.07708      #change this value later
+    nextXPos1=firstPos1[1] + incrementYAxis
+    
+    movel (p[firstPos1[0], nextXPos1, firstPos1[2], firstPos1[3], firstPos1[4], firstPos1[5]])
+    sleep(0.1)
+    
+    socket_send_string(get_actual_tcp_pose(), socket_name)
+    sleep(0.1)
+    
+    socket_send_string("trig", socket_name)
+    textmsg("trig send")
+    #receive = socket_read_ascii_float(2, socket_name)
+    
+    sleep(0.01)
+    continue
+    end
+  
+  if receive[1] == 25:
+    textmsg("going to part II")
+    break
+  sleep(0.01)
+  end
+  
+if receive[1] == 55:
+
+textmsg("im going to move up a little")
+
+d=get_actual_tcp_pose()
+
+nextXPos=d[0] + incrementXAxispartI
+
+movel (p[nextXPos, d[1], d[2], d[3], d[4], d[5]])
+sleep(0.5)
+
+socket_send_string(get_actual_tcp_pose(), socket_name)
+sleep(0.5)
+
+socket_send_string("trig", socket_name)
+textmsg("trig send")
+
+
+sleep(0.01)
+continue
+end
+  
+  #receive = socket_read_ascii_float(2, socket_name)
+  textmsg(receive)
+  sleep(0.01)
+
+  b=get_actual_tcp_pose()
+
+  x= receive[1] / 1000
+  y= receive[2] / 1000
+  z= 0.125
+
+  movel (p[x, y, 0.219, b[3], b[4], b[5]])
+  movel (p[x, y, z, b[3], b[4], b[5]])
+
+  sleep(0.1)
+
+  set_digital_out(0,False)
+  sleep(0.5)
+  movel (p[x, y, 0.380, b[3], b[4], b[5]])
+  sleep(0.1)
+
+  movel (p[0.647765, -0.488746, 0.426599, 2.10683, 2.31768, -0.00587645])
+  movel (p[0.193632, -0.729098, 0.296852, 2.10697, 2.31775, -0.00588604])
+  sleep(0.1)
+  set_digital_out(0,True)
+  sleep(0.5)
+  movel (p[x + 0.066, y- 0.140, 0.47759, b[3], b[4], b[5]])
+  sleep(0.2)
+
+  socket_send_string(get_actual_tcp_pose(), socket_name)
+  textmsg("actual tcp send")
+
+  sleep(0.2)
+
+  socket_send_string("trig", socket_name)
+  textmsg("trig send")
+
+#sleep(0.1)
+#continue
+#end
+
+end
+
+
+
+
+
+
+# Part II
+firstPos=(p[0.485645, -0.502465, 0.477633, 2.27877, -2.15725, 0.014982])
+movel(firstPos)
+sleep(0.1)
+
+set_digital_out(0,True)
+sleep(4)
+
+socket_send_string("trig", socket_name)
+textmsg("trig send2")
+sleep(0.1)
+
+while(True):
+
+receive = socket_read_ascii_float(2, socket_name)
+
+if receive[1] == 69:
+
+textmsg("IM GOING TO NEXT ROW")
+incrementXAxis=incrementXAxis + 0.06587
+nextXPos=firstPos[0] + incrementXAxis
+
+movel (p[nextXPos, firstPos[1], firstPos[2], firstPos[3], firstPos[4], firstPos[5]])
+sleep(0.1)
+
+socket_send_string(get_actual_tcp_pose(), socket_name)
+sleep(0.1)
+
+socket_send_string("trig", socket_name)
+textmsg("trig send")
+#receive = socket_read_ascii_float(2, socket_name)
+
+sleep(0.01)
+continue
+end
+
+if receive[1] == 55:
+
+textmsg("im going to move up a little")
+
+c=get_actual_tcp_pose()
+
+nextYPos=c[1] + incrementYAxispartII
+
+movel (p[c[0], nextYPos, c[2], c[3], c[4], c[5]])
+sleep(0.5)
+
+socket_send_string(get_actual_tcp_pose(), socket_name)
+sleep(0.1)
+
+socket_send_string("trig", socket_name)
+textmsg("trig send1")
+#receive = socket_read_ascii_float(2, socket_name)
+
+sleep(0.01)
+continue
+end
+
+
+textmsg(receive)
+sleep(0.01)
+
+a=get_actual_tcp_pose()
+
+x= receive[1] / 1000
+y= receive[2] / 1000
+z= 0.125
+
+movel (p[x, y, 0.219, a[3], a[4], a[5]])
+movel (p[x, y, z, a[3], a[4], a[5]])
+
+sleep(0.1)
+
+set_digital_out(0,False)
+
+movel (p[x, y, 0.366, a[3], a[4], a[5]])
+sleep(0.1)
+#movel (p[0.647765, -0.488746, 0.416599, 2.10683, 2.31768, -0.00587645])
+#movel (p[0.193632, -0.729098, 0.296852, 2.10697, 2.31775, -0.00588604])
+#sleep(0.1)
+set_digital_out(0,True)
+sleep(0.1)
+
+#set_digital_out(0,True)
+
+movel (p[x+0.140, y+0.075, a[2], a[3], a[4], a[5]], 0.3, 0.5)
+sleep(0.1)
+
+socket_send_string(get_actual_tcp_pose(), socket_name)
+
+sleep(0.1)
+
+socket_send_string("trig", socket_name)
+textmsg("trig send")
+
+
+end
+
+ 
+
+
+
