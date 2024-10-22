@@ -31,11 +31,11 @@ clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
 # Part I variables
-bottlecoordsX1 = 171.565625
-bottlecoordsY1 = 114.021875
+bottlecoordsX1 = 162.10275597572328
+bottlecoordsY1 = 147.63683481216432
 
-robotcoordsX1 = 320.00
-robotcoordsY1 = 770.29
+robotcoordsX1 = 317.70
+robotcoordsY1 = 810.54
 
 offsetX1 = (robotcoordsX1) + (bottlecoordsX1)
 offsetY1 = (robotcoordsY1) - (bottlecoordsY1)
@@ -104,7 +104,7 @@ def main():
                 print("Going to next row.")
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 602:                                   #certain y border   #-484 correct position
+            elif array1[1] < -484:                                   #certain y border   #-484 correct position
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()

@@ -54,7 +54,7 @@ def main():
         return -1
 
     # Define the ROI coordinates (adjust as necessary)
-    roi_x, roi_y, roi_w, roi_h = 0, 235, 1280, 250  # Green border ROI dimensions
+    roi_x, roi_y, roi_w, roi_h = 515, 0, 250, 720  # Green border ROI dimensions
 
     while True:
         time.sleep(1)
@@ -76,7 +76,7 @@ def main():
         roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
 
         # Run YOLOv8 OBB inference on the cropped ROI frame
-        results = model(roi_frame, verbose=False, conf=0.45)  # Lower confidence threshold
+        results = model(roi_frame, verbose=False, conf=0.75)  # Lower confidence threshold
 
         # Copy ROI frame for annotations
         annotated_frame = undistorted_frame.copy()
