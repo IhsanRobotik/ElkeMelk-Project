@@ -202,11 +202,17 @@ def main():
                         deltaX = realX
                         deltaY = realY #i might make a mistake here
 
-                        pickupX = deltaX + offsetX1 + (array1[0] - firstposX1)
+                        pickupX = -deltaX + offsetX1 + (array1[0] - firstposX1)
                         pickupY = deltaY + offsetY1 + (array1[1] - firstposY1)
                         
                         #print(f"array: {array1[0]},{array1[1]}")
-                        print(f"robot coords:{realX},{realY}")
+                        # print(f"robot coords:{realX},{realY}")
+                        
+                        # print(f"mm coords:{realX},{realY}")
+                        # print(f"robot coords:{offsetX1},{offsetY1}")
+                        # print(f"robot coords:{pickupX},{pickupY}")
+                        # print(f"array: {array1[0]},{array1[1]}")
+                        # print(f"firstpos: {firstposX1},{firstposY1}")
 
                         formatted_string = "({0}, {1})".format(pickupX, pickupY)
                         message_to_send = formatted_string  # Coordinates to send
