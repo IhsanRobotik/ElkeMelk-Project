@@ -1,12 +1,13 @@
 # in pinched area, declare x xy y yx 
 # take picture from normal position
 # take the bottle in sideway fashion
-
-#textmsg(get_actual_tcp_pose())
-#halt
+#p[0.757784, 0.063941, 1.09375, -1.37123, 1.25823, 1.19489]
+#T 0151d09h17m50.840s RTMachine Program unnamed started 
+#p[0.757784, 0.063941, 1.09375, -1.37123, 1.25823, 1.19489]
+#T 0151d09h17m50.840s RTMachine Program unnamed started 
 
 port = 5005
-ip = "192.168.74.1"
+ip = "192.168.0.1"
 socket_name = "fadil"
 
 incrementXAxis = 0
@@ -20,13 +21,16 @@ movel(firstPos)
 set_digital_out(0,True)
 socket_send_string("trig", socket_name)
 
+global x = 0
+global y = 0
+
 countMoveCamera = 0
 rowCounter = 0
 nextPalletZ = 0
 toolToCardboardZ = 0.490 #fill this
 
 # cecnter carton coordinate
-mcc = p[firstPos[0] + 0.5, firstPos[1] + 0.6, firstPos[2], firstPos[3], firstPos[4], firstPos[5]]
+mcc = p[firstPos[0] + 0.5, firstPos[1] + 0.45, firstPos[2], firstPos[3], firstPos[4], firstPos[5]]
 
 def goToConveyor ():
   movel (p[0.647765, -0.488746, 0.416599, 2.10683, 2.31768, -0.00587645])
@@ -38,7 +42,6 @@ while(True):
     receive = socket_read_ascii_float(2, socket_name)
 
     if receive[1] == 69:
-        textmsg("next row")
 
         # how much you want to increment forward
         incrementXAxis=incrementXAxis + 0.06587
@@ -48,13 +51,13 @@ while(True):
         movel (p[nextXPos, firstPos[1], firstPos[2], firstPos[3], firstPos[4], firstPos[5]])
 
         socket_send_string(get_actual_tcp_pose(), socket_name)
-        sleep(0.5)
+        sleep(0.7)
         socket_send_string("trig", socket_name)
         receive = socket_read_ascii_float(2, socket_name)
 
         rowCounter = rowCounter + 1
 
-        if rowCounter == 3:
+        if rowCounter == 5:
             grabPallet = mcc
             liftPallet = mcc
     
@@ -66,28 +69,28 @@ while(True):
             # go down and grab the pallet
             grabPallet[2] = grabPallet[2] - toolToCardboardZ - nextPalletZ
             movel(grabPallet)
-            
+
+            set_digital_out(1, True)
+      
             # lift the pallet up
             movel(liftPallet)
-    
-            # turn on vacuum
-            set_digital_out(1,True)
-            
-            # move it somewhere else
-    
+         
+            movel(p[0.757784, 0.063941, 1.09375, -1.37123, 1.25823, 1.19489])
+            movel(p[0.712601, 0.496425, 0.632106, -1.1584, 0.924462, 1.24352])
+
             # turn off vacuum
             set_digital_out(1, False)
     
             nextPalletZ = nextPalletZ + 0.241
-            
+
             # go to next first pos and descent z axis
             firstPos[2] = firstPos[2] - nextPalletZ
             movel(firstPos)
+            
             rowCounter = 0
         end
 
     else:
-      textmsg(receive)
       a=get_actual_tcp_pose()
 
       x = receive[1] / 1000
@@ -96,12 +99,11 @@ while(True):
       # declare maximum x axis to pick from front
       if receive[1]  <  335.78:
 
-        tcpy = 0.277
-        tcpx = 0.293
+        tcpy = 0.277 #move to top
+        tcpx = 0.2327
 
         # sideway bottlepickup coordinate  
-        s = p[0.367328, -0.502467, 0.042576, 3.1325, 1.43769e-05, 8.63231e-05]
-        # move to the bottle coordinate
+        s = p[0.286888, -0.34773, 0.144659, 3.12314, -0.242821, 0.00131571]# move to the bottle coordinate
         movel (p[x + tcpx, y -  tcpy, 0.460 - nextPalletZ, s[3], s[4], s[5]])
 
         # ascend down to the bottle neck
@@ -122,18 +124,21 @@ while(True):
         # send currenct position and trigger message
         socket_send_string(get_actual_tcp_pose(), socket_name)
         socket_send_string("trig", socket_name)
-        textmsg("trig sent")
 
         #pick from the front
         else:
-          movel (p[x, y, 0.219 - nextPalletZ, a[3], a[4], a[5]])
-          movel (p[x, y, 0.125 - nextPalletZ, a[3], a[4], a[5]])
+          a = get_actual_tcp_pose()
+
+          movel (p[x, y, 0.460 - nextPalletZ, a[3], a[4], a[5]])
+          movel (p[x, y, 0.366 - nextPalletZ, a[3], a[4], a[5]])
   
+          textmsg(x, y)
+
           set_digital_out(0,False)
   
           # lift the bottle
-          movel (p[x, y, 0.366 - nextPalletZ, a[3], a[4], a[5]])
-  
+          movel (p[x, y, 0.607 - nextPalletZ, a[3], a[4], a[5]])
+
           set_digital_out(0,True)
   
           movel (p[x+0.140, y+0.075, a[2] - nextPalletZ, a[3], a[4], a[5]])
@@ -141,7 +146,6 @@ while(True):
           socket_send_string(get_actual_tcp_pose(), socket_name)
   
           socket_send_string("trig", socket_name)
-          textmsg("trig sent")
  
         end
     end
