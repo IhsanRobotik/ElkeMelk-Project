@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 1
+camera = 0
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'

@@ -5,7 +5,7 @@ from ultralytics import YOLO
 import socket
 import ast
 import time
-camera = 1
+camera = 0
 
 # Ensure CUDA is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -31,11 +31,11 @@ clientsocket, address = s.accept()
 print(f"Connection from {address} has been established!")
 
 # Part I variables
-bottlecoordsX1 = 171.565625
-bottlecoordsY1 = 114.021875
+bottlecoordsX1 = 182.37631387710573
+bottlecoordsY1 = 94.82909655570984
 
-robotcoordsX1 = 320.00
-robotcoordsY1 = 770.29
+robotcoordsX1 = 303.39
+robotcoordsY1 = 752.75
 
 offsetX1 = (robotcoordsX1) + (bottlecoordsX1)
 offsetY1 = (robotcoordsY1) - (bottlecoordsY1)
@@ -47,11 +47,11 @@ array1 = [firstposX1, firstposY1]
 
 
 # Part II variables
-bottlecoordsX = 149.59208498001098                       #Bottle coordinates X via cameraview
-bottlecoordsY = 90.73866143226624                         #Bottle coordinates Y via cameraview
+bottlecoordsX = 153.19895958900452                 #Bottle coordinates X via cameraview
+bottlecoordsY = 101.91653695106507                 #Bottle coordinates Y via cameraview
 
-robotcoordsX = 335.18                              #Robot coordinates X, real world
-robotcoordsY = -489.44                              #Robot coordinates Y, real world
+robotcoordsX = 329.81                              #Robot coordinates X, real world
+robotcoordsY = -493.17                              #Robot coordinates Y, real world
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
@@ -90,7 +90,9 @@ def main():
 
     array = [firstposX, firstposY]
 
+    array1	= [firstposX1, firstposY1]
     while True:
+        
         msg = clientsocket.recv(1024)
 
         if not msg:
@@ -102,9 +104,11 @@ def main():
             counterb = 0
             if array1[0] > 557:
                 print("Going to next row.")
+                print(f"hello: {array1[1]}")
+                print("hoiiiiii")
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 602:                                   #certain y border   #-484 correct position
+            elif array1[1] < 602:                                   #certain y border   #-484 correct position    602 to test
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -241,7 +245,7 @@ def main():
             array1[0] = array[0] * 1000
             array1[1] = array[1] * 1000
         
-        else: 
+        else:
             break
 
         # Display the result for the detected circles
