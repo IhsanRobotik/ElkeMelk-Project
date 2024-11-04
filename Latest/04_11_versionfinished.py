@@ -47,11 +47,11 @@ array1 = [firstposX1, firstposY1]
 
 
 # Part II variables
-bottlecoordsX = 147.35420093536376                  #Bottle coordinates X via cameraview
-bottlecoordsY = 86.76260018348694                   #Bottle coordinates Y via cameraview
+bottlecoordsX = 182.1722815513611                   #Bottle coordinates X via cameraview      
+bottlecoordsY = 92.53994426727296                   #Bottle coordinates Y via cameraview
 
-robotcoordsX = 338.31                              #Robot coordinates X, real world
-robotcoordsY = -490.56                             #Robot coordinates Y, real world
+robotcoordsX = 342.77                              #Robot coordinates X, real world
+robotcoordsY = -525.86                             #Robot coordinates Y, real world
 
 offsetX = (robotcoordsX) + (bottlecoordsY)
 offsetY = (robotcoordsY) + (bottlecoordsX)
@@ -62,6 +62,10 @@ firstposY = -502.46                                  #First position of the robo
 array = [firstposX, firstposY]
 
 counter = 0
+
+# Define the Y-coordinate threshold
+X_THRESHOLD = 450  # Adjust this value as needed to filter objects by x-coordinate
+Y_THRESHOLD = 235  # Adjust this value as needed to filter objects by y-coordinate
 
 def main():
     global array
@@ -83,7 +87,6 @@ def main():
     if not cap.isOpened():
         print("Camera not accessible.")
         return -1
-    roi_x, roi_y, roi_w, roi_h = 515, 0, 250, 720
 
     firstposX = 485.64                                   #First position of the robot
     firstposY = -502.46                                  #First position of the robot
@@ -105,7 +108,7 @@ def main():
             if array1[0] > 557:
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 602:                                   #certain y border   #-484 correct position    602 to test   demo:276
+            elif array1[1] < 276:                                   #certain y border   #-484 correct position    602 to test   demo:276
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -125,51 +128,30 @@ def main():
                     new_camera_mtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
                     undistorted_frame = cv.undistort(frame, mtx, dist, None, new_camera_mtx)
 
-                    # Crop the undistorted frame to the ROI
-                    roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
-
                     # Run YOLOv8 inference on the cropped ROI
-                    results = model(roi_frame, verbose=False, conf=0.75)
-
-                    # Convert YOLOv8 results back into an OpenCV-friendly format for display
-                    annotated_roi_frame = results[0].plot()
-
-                    # Overlay the annotated ROI back onto the original annotated frame
-                    annotated_frame = undistorted_frame.copy()
-                    annotated_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w] = annotated_roi_frame
-
-                    # Draw the ROI rectangle on the annotated frame
-                    cv.rectangle(annotated_frame, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (0, 255, 0), 2)
+                    results = model(undistorted_frame, verbose=False, conf=0.75)
 
                     # Initialize variables to track the leftmost object
-                    leftmost_x = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
-                    leftmost_center = None
-
-                    detected_classes = []  # To log detected classes
+                    bottommost_y = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
+                    bottommost_center = None
 
                     # Iterate over the results and find the leftmost detected object
                     if results and results[0].obb:
                     # print("Detected objects:")  # Debugging info
                         for i, obb in enumerate(results[0].obb):
-                        # Get the class label
+                            # Get the class label
                             label = results[0].names[int(obb.cls[0])]
-                            detected_classes.append(label)  # Log detected class labels
-                            # print(f"Object {i}: {label}")  # Debug: Print object label
-
+                    
                             # Get the OBB coordinates (vertices)
                             vertices = obb.xyxyxyxy[0].cpu().numpy()  # Retrieve the vertices (4 points)
-
-                            # Adjust the coordinates to the original frame by adding the ROI offset
-                            vertices[:, 0] += roi_x  # Adjust x-coordinates
-                            vertices[:, 1] += roi_y  # Adjust y-coordinates
 
                             # Draw the OBB using the vertices for all detected objects
                             points = vertices.astype(int)
                             for j in range(len(points)):
-                                cv.line(annotated_frame, tuple(points[j]), tuple(points[(j + 1) % len(points)]), (0, 255, 0), 2)
+                                cv.line(undistorted_frame, tuple(points[j]), tuple(points[(j + 1) % len(points)]), (0, 255, 0), 2)
 
                             # Draw the class label for all detected objects
-                            cv.putText(annotated_frame, label, (points[0][0], points[0][1] - 10), 
+                            cv.putText(undistorted_frame, label, (points[0][0], points[0][1] - 10), 
                                     cv.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
                             # Process only the 'bottle_open' class for center point and specific handling
@@ -177,28 +159,29 @@ def main():
                                 # Calculate the center point of the OBB
                                 center_x = np.mean(vertices[:, 0])  # Average x-coordinates
                                 center_y = np.mean(vertices[:, 1])  # Average y-coordinates
+                                
+                                if center_x > X_THRESHOLD and center_y > 250:
+                                    # Draw a circle at the center point for 'bottle_open'
+                                    cv.circle(undistorted_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
-                                # Draw a circle at the center point for 'bottle_open'
-                                cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
+                                    # Display the on-screen coordinates in the window
+                                    on_screen_text = f"Coords: ({int(center_x)}, {int(center_y)})"
+                                    cv.putText(undistorted_frame, on_screen_text, (int(center_x) + 10, int(center_y) - 10), 
+                                            cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
 
-                                # Display the on-screen coordinates in the window
-                                on_screen_text = f"Coords: ({int(center_x)}, {int(center_y)})"
-                                cv.putText(annotated_frame, on_screen_text, (int(center_x) + 10, int(center_y) - 10), 
-                                        cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-
-                                # Check if this object is the leftmost one
-                                if center_y > leftmost_x:
-                                    leftmost_x = center_y
-                                    leftmost_center = (center_x, center_y)
+                                    # Check if this object is the leftmost one
+                                    if center_y > bottommost_y:
+                                        bottommost_y = center_y
+                                        bottommost_center = (center_x, center_y)
 
                     # Output the leftmost object's center
-                    if leftmost_center:
-                        print(f"Leftmost object center: {leftmost_center}")
+                    if bottommost_center:
+                        print(f"Leftmost object center: {bottommost_center}")
                         # time.sleep(1)
 
                         # print(f"Leftmost detected object center: {leftmost_center}")
-                        realX = leftmost_center[0] * conversion_factor
-                        realY = leftmost_center[1] * conversion_factor
+                        realX = bottommost_center[0] * conversion_factor
+                        realY = bottommost_center[1] * conversion_factor
 
                         deltaX = realX
                         deltaY = realY #i might make a mistake here
@@ -246,9 +229,7 @@ def main():
             break
 
         # Display the result for the detected circles
-        x,y,w,h = roi
-        annotated1_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
-        cv.imshow("Detected Circle 1", annotated1_frame) #show the cropped imgge
+        cv.imshow("Detected Circle 1", undistorted_frame) #show the cropped imgge
 
         if cv.waitKey(1) == ord('w'):
             break
@@ -269,8 +250,9 @@ def main():
     
     if not cap.isOpened():
         return -1
-    roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
-
+    
+    rij = 0
+    
     while True:
         msg = clientsocket.recv(1024)
         
@@ -281,12 +263,20 @@ def main():
 
         if "trig" in msg:
             
-            if array[1] > 620:
+            if array[1] > 580:
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
+                rij = rij + 1
+                print("rij:", rij)
+
+            elif rij > 7 and array[1] > 540:                                      #rij moet 7 zijn 2 voor testen
+                print("End of code")
+                clientsocket.send(bytes("(33)", "ascii"))
+                break
             else:
                 while True:
-                    # time.sleep(1)
+                    
+                    #time.sleep(1)
                     # Capture frame-by-frame
                     ret, frame = cap.read()
 
@@ -301,23 +291,13 @@ def main():
                     new_camera_mtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), -1, (w, h))
                     undistorted_frame = cv.undistort(frame, mtx, dist, None, new_camera_mtx)
 
-                    # Crop the undistorted frame to the ROI
-                    roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
-
                     # Run YOLOv8 OBB inference on the cropped ROI frame
-                    results = model(roi_frame, verbose=False, conf=0.80)  # Lower confidence threshold
-
-                    # Copy ROI frame for annotations
-                    annotated_frame = undistorted_frame.copy()
-
-                    # Draw the ROI rectangle on the annotated frame
-                    cv.rectangle(annotated_frame, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (0, 255, 0), 2)
+                    results = model(undistorted_frame, verbose=False, conf=0.90)  # Lower confidence threshold
 
                     # Initialize variables to track the leftmost object
-                    leftmost_x = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
-                    leftmost_center = None
+                    rightmost_x = float('-inf')  # Initialize to infinity, to ensure any value of center_x will be smaller.
+                    rightmost_center = None
 
-                    detected_classes = []  # To log detected classes
 
                     # Iterate over the results and find the leftmost detected object
                     if results and results[0].obb:
@@ -325,23 +305,17 @@ def main():
                         for i, obb in enumerate(results[0].obb):
                             # Get the class label
                             label = results[0].names[int(obb.cls[0])]
-                            detected_classes.append(label)  # Log detected class labels
-                            # print(f"Object {i}: {label}")  # Debug: Print object label
 
                             # Get the OBB coordinates (vertices)
                             vertices = obb.xyxyxyxy[0].cpu().numpy()  # Retrieve the vertices (4 points)
 
-                            # Adjust the coordinates to the original frame by adding the ROI offset
-                            vertices[:, 0] += roi_x  # Adjust x-coordinates
-                            vertices[:, 1] += roi_y  # Adjust y-coordinates
-
                             # Draw the OBB using the vertices for all detected objects
                             points = vertices.astype(int)
                             for j in range(len(points)):
-                                cv.line(annotated_frame, tuple(points[j]), tuple(points[(j + 1) % len(points)]), (0, 255, 0), 2)
+                                cv.line(undistorted_frame, tuple(points[j]), tuple(points[(j + 1) % len(points)]), (0, 255, 0), 2)
 
                             # Draw the class label for all detected objects
-                            cv.putText(annotated_frame, label, (points[0][0], points[0][1] - 10), 
+                            cv.putText(undistorted_frame, label, (points[0][0], points[0][1] - 10), 
                                     cv.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
 
                             # Process only the 'bottle_open' class for center point and specific handling
@@ -350,33 +324,34 @@ def main():
                                 center_x = np.mean(vertices[:, 0])  # Average x-coordinates
                                 center_y = np.mean(vertices[:, 1])  # Average y-coordinates
 
-                                # Draw a circle at the center point for 'bottle_open'
-                                cv.circle(annotated_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
+                                if center_y > Y_THRESHOLD and center_x > 350:
+                                    # Draw a circle at the center point for 'bottle_open'
+                                    cv.circle(undistorted_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
-                                # Display the on-screen coordinates in the window
-                                on_screen_text = f"Coords: ({int(center_x)}, {int(center_y)})"
-                                cv.putText(annotated_frame, on_screen_text, (int(center_x) + 10, int(center_y) - 10), 
-                                        cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+                                    # Display the on-screen coordinates in the window
+                                    on_screen_text = f"Coords: ({int(center_x)}, {int(center_y)})"
+                                    cv.putText(undistorted_frame, on_screen_text, (int(center_x) + 10, int(center_y) - 10), 
+                                            cv.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
 
-                                print(f"Leftmost object center: ({center_x}, {center_y})")
-
-                                # Check if this object is the leftmost one
-                                if center_x > leftmost_x:
-                                    leftmost_x = center_x
-                                    leftmost_center = (center_x, center_y)
+                                    # Check if this object is the leftmost one
+                                    if center_x > rightmost_x:
+                                        rightmost_x = center_x
+                                        rightmost_center = (center_x, center_y)
+                                        print(f"Rightmost object center: {rightmost_center}")
 
                     # Output the leftmost object's center and calculate real-world coordinates
-                    if leftmost_center:
-                        realX = leftmost_center[0] * conversion_factor
-                        realY = leftmost_center[1] * conversion_factor
+                    if rightmost_center:
+                        realX = rightmost_center[0] * conversion_factor
+                        realY = rightmost_center[1] * conversion_factor
 
                         deltaY = (-1) * realX
                         deltaX = (-1) * realY  # Reversing the coordinates here
 
                         pickupX = deltaX + offsetX + ((firstposX - array[0]) * (-1))
                         pickupY = deltaY + offsetY + ((firstposY - array[1]) * (-1))
+                        print(f"mm coords:{realX},{realY}")
 
-                        # print(f"mm coords:{realX},{realY}")
+
                         # print(f"robot coords:{offsetX},{offsetY}")
                         # print(f"robot coords:{pickupX},{pickupY}")
                         # print(f"array: {array[0]},{array[1]}")
@@ -397,7 +372,7 @@ def main():
                         if counter > 5:
                             print("Move up a little because no bottles")
                             clientsocket.send(bytes("(55)", "ascii"))
-                            array[1] = array[1] + 170.5
+                            array[1] = array[1] + 75                          #was 170.5
                             break
                           
         elif "p" in msg:
@@ -412,9 +387,7 @@ def main():
             break 
         
         # Display the result for the detected circles
-        x,y,w,h = roi
-        annotated_frame = annotated_frame[y:y+h, x:x+w] #crop to roi
-        cv.imshow("Detected Circle 1", annotated_frame) #show the cropped imgge
+        cv.imshow("Detected Circle 1", undistorted_frame) #show the cropped imgge
 
 
         if cv.waitKey(1) == ord('q'):

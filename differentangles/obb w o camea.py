@@ -85,7 +85,7 @@ def main():
         roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
 
         # Run YOLOv8 inference on the cropped ROI
-        results = model(roi_frame, verbose=False, conf=0.75)
+        results = model(roi_frame, verbose=False, conf=0.80)
 
         # Convert YOLOv8 results back into an OpenCV-friendly format for display
         annotated_roi_frame = results[0].plot()

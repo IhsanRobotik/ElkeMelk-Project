@@ -105,7 +105,7 @@ def main():
             if array1[0] > 557:
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 602:                                   #certain y border   #-484 correct position    602 to test   demo:276
+            elif array1[1] < 620:                                   #certain y border   #-484 correct position    602 to test   demo:276
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -270,7 +270,9 @@ def main():
     if not cap.isOpened():
         return -1
     roi_x, roi_y, roi_w, roi_h = 0, 240, 1280, 210  # Define the ROI coordinates
-
+    
+    rij = 0
+    
     while True:
         msg = clientsocket.recv(1024)
         
@@ -281,9 +283,16 @@ def main():
 
         if "trig" in msg:
             
-            if array[1] > 620:
+            if array[1] > 580:
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
+                rij = rij + 1
+                print("rij:", rij)
+
+            elif rij > 7 and array[1] > 540:                                      #rij moet 7 zijn 2 voor testen
+                print("End of code")
+                clientsocket.send(bytes("(33)", "ascii"))
+                break
             else:
                 while True:
                     # time.sleep(1)
@@ -305,7 +314,7 @@ def main():
                     roi_frame = undistorted_frame[roi_y:roi_y + roi_h, roi_x:roi_x + roi_w]
 
                     # Run YOLOv8 OBB inference on the cropped ROI frame
-                    results = model(roi_frame, verbose=False, conf=0.80)  # Lower confidence threshold
+                    results = model(roi_frame, verbose=False, conf=0.90)  # Lower confidence threshold
 
                     # Copy ROI frame for annotations
                     annotated_frame = undistorted_frame.copy()
@@ -397,7 +406,7 @@ def main():
                         if counter > 5:
                             print("Move up a little because no bottles")
                             clientsocket.send(bytes("(55)", "ascii"))
-                            array[1] = array[1] + 170.5
+                            array[1] = array[1] + 75                          #was 170.5
                             break
                           
         elif "p" in msg:
