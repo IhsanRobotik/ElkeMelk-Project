@@ -108,7 +108,7 @@ def main():
             if array1[0] > 557:
                 clientsocket.send(bytes("(69)", "ascii"))
 
-            elif array1[1] < 276:                                   #certain y border   #-484 correct position    602 to test   demo:276
+            elif array1[1] < 200:                                   #certain y border   #-484 correct position    602 to test   demo:200
                 print("Going to part II")
                 clientsocket.send(bytes("(25)", "ascii"))
                 cap.release()
@@ -160,7 +160,7 @@ def main():
                                 center_x = np.mean(vertices[:, 0])  # Average x-coordinates
                                 center_y = np.mean(vertices[:, 1])  # Average y-coordinates
                                 
-                                if center_x > X_THRESHOLD and center_y > 250:
+                                if center_x > X_THRESHOLD and center_y > 200:
                                     # Draw a circle at the center point for 'bottle_open'
                                     cv.circle(undistorted_frame, (int(center_x), int(center_y)), 5, (255, 0, 0), -1)
 
@@ -263,13 +263,13 @@ def main():
 
         if "trig" in msg:
             
-            if array[1] > 580:
+            if array[1] > 580:                                                      #correct value: 580
                 print("Going to next row")
                 clientsocket.send(bytes("(69)", "ascii"))
                 rij = rij + 1
                 print("rij:", rij)
 
-            elif rij > 7 and array[1] > 540:                                      #rij moet 7 zijn 2 voor testen
+            elif rij > 8 and array[1] > 400:                                      #rij moet 7 zijn 2 voor testen
                 print("End of code")
                 clientsocket.send(bytes("(33)", "ascii"))
                 break
